@@ -1,0 +1,35 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:theone/core/api_client.dart';
+import 'package:theone/features/auth/provider/auth_provider.dart';
+import '../../../core/api_client_provider.dart';
+
+class AuthApi {
+  final ApiClient apiClient;
+
+  AuthApi(this.apiClient);
+
+  Future<void> login(WidgetRef ref, String username, String password) async {
+    try {
+      final response = await apiClient.rawPost('/login', {
+        'loginId': username,
+        'password': password,
+      });
+
+      final authHeader = response.headers['authorization'];
+      if (authHeader != null && authHeader.startsWith('Bearer ')) {
+        final token = authHeader.substring(7);
+        ref.read(authProvider.notifier).login(token);
+      } else {
+        throw Exception('토큰이 응답 헤더에 없습니다.');
+      }
+    } catch (e) {
+      throw Exception('로그인 실패');
+    }
+  }
+}
+
+final authApiProvider = Provider<AuthApi>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return AuthApi(apiClient);
+});
