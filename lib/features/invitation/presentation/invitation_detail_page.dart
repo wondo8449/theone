@@ -27,7 +27,7 @@ class InvitationDetailPage extends ConsumerWidget {
 
     if (invitation == null) {
       return Scaffold(
-        appBar: AppBar(title: Text('풍삶초 상세 정보')),
+        appBar: AppBar(title: Text('풍삶초 상세 정보', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true),
         body: Center(child: Text('풍삶초 정보를 찾을 수 없습니다.')),
       );
     }
@@ -64,7 +64,7 @@ class InvitationDetailPage extends ConsumerWidget {
     });
 
     return Scaffold(
-      appBar: AppBar(title: Text('풍삶초 수정')),
+      appBar: AppBar(title: Text('풍삶초 상세 정보', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(

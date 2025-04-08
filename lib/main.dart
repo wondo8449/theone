@@ -4,6 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:theone/features/auth/presentation/my_page.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
 import 'package:theone/features/auth/presentation/login_page.dart';
+import 'package:theone/features/sharing/presentation/QT_sharing_detail_page.dart';
+import 'package:theone/features/sharing/presentation/QT_write_page.dart';
+import 'package:theone/features/sharing/presentation/invitation_sharing_detail_page.dart';
+import 'package:theone/features/sharing/presentation/invitation_write_page.dart';
 import 'package:theone/theme.dart';
 import 'package:theone/widgets/stack_page.dart';
 
@@ -32,6 +36,10 @@ class MyApp extends ConsumerWidget {
       routes: {
         '/login' : (context) => LoginPage(),
         '/mypage': (context) => MyPage(),
+        '/QTwrite': (context) => QTWritePage(),
+        '/invitationWrite': (context) => InvitationWritePage(),
+        '/InvitationSharingDetail': (context) => InvitationSharingDetailPage(),
+        '/QTSharingdetail': (context) => QTSharingDetailPage()
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(

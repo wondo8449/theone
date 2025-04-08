@@ -1,14 +1,23 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:theone/core/constants/app_colors.dart';
 import 'package:theone/core/constants/app_spacing.dart';
 import 'package:theone/core/constants/app_typography.dart';
-
+import 'package:theone/features/sharing/provider/sharing_provider.dart';
 import '../../../core/constants/app_border_radius.dart';
 
 class SharingPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final QTSharingList = ref.watch(QTSharingProvider);
+    final invitationSharingList = ref.watch(invitationSharingProvider);
+
+    String formatDate(String timestamp) {
+      DateTime date = DateTime.parse(timestamp);
+      return DateFormat('yyyy년 M월 d일').format(date);
+    }
 
     return Scaffold(
       body: Padding(
@@ -19,7 +28,7 @@ class SharingPage extends ConsumerWidget {
                 children: [
                   TextButton(
                       onPressed: () {
-
+                        Navigator.pushNamed(context, '/QTwrite');
                       },
                       style: ButtonStyle(
                         backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
@@ -30,7 +39,7 @@ class SharingPage extends ConsumerWidget {
                   SizedBox(width: 16),
                   TextButton(
                       onPressed: () {
-
+                        Navigator.pushNamed(context, '/invitationWrite');
                       },
                       style: ButtonStyle(
                           backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
@@ -58,67 +67,53 @@ class SharingPage extends ConsumerWidget {
                          child: Text('+ 더보기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.grayScale_850))),
                    ],
                   ),
-                  Card(
-                    color: Colors.white,
-                    margin: AppSpacing.small4,
-                    child: Padding(
-                        padding: AppSpacing.small12,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('하늘의 것을 지혜롭게 사용해라', style: AppTypography.headline6,),
-                                Text('4월 7일 김예찬', style: AppTypography.body2,)
-                              ],
-                            ),
-                            Text('QT 나눔 내용입니다. \n QT 나눔 내용입니다. \n QT 나눔 내용입니다.', style: AppTypography.body3)
-                          ],
+                  QTSharingList.when(
+                    data: (QTsharings) {
+                      return SizedBox(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: min(QTsharings.length, 3),
+                          itemBuilder: (context, index) {
+                            final QTSharing = QTsharings[index];
+                            String formattedDate = formatDate(QTSharing['createdAt']);
+
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/QTSharingdetail', arguments: QTSharing['sharingId']);
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                margin: AppSpacing.small4,
+                                child: Padding(
+                                  padding: AppSpacing.small12,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(QTSharing['title'], style: AppTypography.headline6),
+                                          Text(
+                                            "$formattedDate  " + QTSharing['userName'],
+                                            style: AppTypography.body3,
+                                          ),
+                                        ],
+                                      ),
+                                      Text(QTSharing['content'], style: AppTypography.body2),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                    ),
-                  ),
-                  Card(
-                    color: Colors.white,
-                    margin: AppSpacing.small4,
-                    child: Padding(
-                      padding: AppSpacing.small12,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('하늘의 것을 지혜롭게 사용해라', style: AppTypography.headline6,),
-                              Text('4월 7일 김예찬', style: AppTypography.body2,)
-                            ],
-                          ),
-                          Text('QT 나눔 내용입니다. \n QT 나눔 내용입니다. \n QT 나눔 내용입니다.', style: AppTypography.body3)
-                        ],
-                      ),
-                    ),
-                  ),
-                  Card(
-                    color: Colors.white,
-                    margin: AppSpacing.small4,
-                    child: Padding(
-                      padding: AppSpacing.small12,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('하늘의 것을 지혜롭게 사용해라', style: AppTypography.headline6,),
-                              Text('4월 7일 김예찬', style: AppTypography.body2,)
-                            ],
-                          ),
-                          Text('QT 나눔 내용입니다. \n QT 나눔 내용입니다. \n QT 나눔 내용입니다.', style: AppTypography.body3)
-                        ],
-                      ),
-                    ),
+                      );
+                    },
+                    loading: () => Center(child: CircularProgressIndicator()),
+                    error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
                   )
-                ],
+
+                ]
               ),
               SizedBox(height: 16),
               Column(
@@ -138,65 +133,50 @@ class SharingPage extends ConsumerWidget {
                           child: Text('+ 더보기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.grayScale_850))),
                     ],
                   ),
-                  Card(
-                    color: Colors.white,
-                    margin: AppSpacing.small4,
-                    child: Padding(
-                      padding: AppSpacing.small12,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('하늘의 것을 지혜롭게 사용해라', style: AppTypography.headline6,),
-                              Text('4월 7일 김예찬', style: AppTypography.body2,)
-                            ],
-                          ),
-                          Text('QT 나눔 내용입니다. \n QT 나눔 내용입니다. \n QT 나눔 내용입니다.', style: AppTypography.body3)
-                        ],
-                      ),
-                    ),
-                  ),
-                  Card(
-                    color: Colors.white,
-                    margin: AppSpacing.small4,
-                    child: Padding(
-                      padding: AppSpacing.small12,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('하늘의 것을 지혜롭게 사용해라', style: AppTypography.headline6,),
-                              Text('4월 7일 김예찬', style: AppTypography.body2,)
-                            ],
-                          ),
-                          Text('QT 나눔 내용입니다. \n QT 나눔 내용입니다. \n QT 나눔 내용입니다.', style: AppTypography.body3)
-                        ],
-                      ),
-                    ),
-                  ),
-                  Card(
-                    color: Colors.white,
-                    margin: AppSpacing.small4,
-                    child: Padding(
-                      padding: AppSpacing.small12,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('하늘의 것을 지혜롭게 사용해라', style: AppTypography.headline6,),
-                              Text('4월 7일 김예찬', style: AppTypography.body2,)
-                            ],
-                          ),
-                          Text('QT 나눔 내용입니다. \n QT 나눔 내용입니다. \n QT 나눔 내용입니다.', style: AppTypography.body3)
-                        ],
-                      ),
-                    ),
+                  invitationSharingList.when(
+                    data: (invitationSharings) {
+                      return SizedBox(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: min(invitationSharings.length, 3),
+                          itemBuilder: (context, index) {
+                            final invitationSharing = invitationSharings[index];
+                            String formattedDate = formatDate(invitationSharing['createdAt']);
+
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/InvitationSharingDetail', arguments: invitationSharing['sharingId']);
+                              },
+                              child: Card(
+                                color: Colors.white,
+                                margin: AppSpacing.small4,
+                                child: Padding(
+                                  padding: AppSpacing.small12,
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(invitationSharing['title'], style: AppTypography.headline6),
+                                          Text(
+                                            "$formattedDate  " + invitationSharing['userName'],
+                                            style: AppTypography.body3,
+                                          ),
+                                        ],
+                                      ),
+                                      Text(invitationSharing['content'], style: AppTypography.body2),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    loading: () => Center(child: CircularProgressIndicator()),
+                    error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
                   )
                 ],
               )
