@@ -1,13 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
+import '../../auth/provider/auth_provider.dart';
 import '../provider/sharing_provider.dart';
 
 class InvitationSharingDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final int id = ModalRoute.of(context)!.settings.arguments as int;
+    final authState = ref.watch(authProvider);
+    final token = authState['token'];
+
+    String formatDate(String timestamp) {
+      DateTime date = DateTime.parse(timestamp);
+      return DateFormat('yyyy년 M월 d일').format(date);
+    }
+
+    String loginId = "";
+    if (token != null && token.isNotEmpty) {
+      try {
+        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
+        loginId = decodedToken['sub'] ?? "";
+      } catch (e) {
+        loginId = "토큰 오류";
+      }
+    }
 
     final invitationDetail = ref.watch(sharingDetailProvider(id));
     final titleController = ref.watch(titleControllerProvider);
@@ -19,7 +39,9 @@ class InvitationSharingDetailPage extends ConsumerWidget {
         centerTitle: true,
         automaticallyImplyLeading: true,
       ),
-      body: Padding(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Padding(
         padding: EdgeInsets.all(16),
         child: invitationDetail.when(
           data: (data) {
@@ -46,10 +68,19 @@ class InvitationSharingDetailPage extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                   ),
-                  maxLines: null,
-                  minLines: 10,
+                  maxLines: 17,
+                  minLines: 17,
                 ),
                 SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('작성자 : ' + invitationData['userName'], style: AppTypography.headline5.copyWith(color: AppColors.grayScale_550)),
+                    Text('작성일 : ' + formatDate(invitationData['createdAt']), style: AppTypography.headline5.copyWith(color: AppColors.grayScale_550))
+                  ],
+                ),
+                SizedBox(height: 16),
+                if(loginId == invitationData['userName'])
                 ElevatedButton(
                   onPressed: () {
                     final title = titleController.text;
@@ -68,7 +99,7 @@ class InvitationSharingDetailPage extends ConsumerWidget {
                     final data = {'id': id, 'title': title, 'content': content, 'sectionCode': "INVITATION"};
                     ref.read(sendSharingDataProvider(data));
                   },
-                  child: Text('저장하기'),
+                  child: Text('수정하기'),
                 ),
               ],
             );
@@ -77,6 +108,7 @@ class InvitationSharingDetailPage extends ConsumerWidget {
           error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
         ),
       ),
+    )
     );
   }
 

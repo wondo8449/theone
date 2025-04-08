@@ -13,7 +13,9 @@ class InvitationWritePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text('풍삶초 나눔 작성', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true, automaticallyImplyLeading:true),
-      body: Padding(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Padding(
         padding: EdgeInsets.all(16),
         child: ListView(
           children: [
@@ -34,8 +36,8 @@ class InvitationWritePage extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              maxLines: null,
-              minLines: 10,
+              maxLines: 17,
+              minLines: 17,
             ),
             SizedBox(height: 16),
 
@@ -71,6 +73,7 @@ class InvitationWritePage extends ConsumerWidget {
           ],
         ),
       ),
+      )
     );
   }
 
@@ -80,12 +83,17 @@ class InvitationWritePage extends ConsumerWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('저장 완료'),
-          content: Text('QT 나눔이 저장되었습니다.'),
+          content: Text('풍삶초 나눔이 저장되었습니다.'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushNamed(context, '/invitationDetail', arguments: id);
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+                Future.microtask(() {
+                  Navigator.of(context).pushReplacementNamed(
+                    '/InvitationSharingDetail',
+                    arguments: id,
+                  );
+                });
               },
               child: Text('확인'),
             ),

@@ -46,7 +46,8 @@ class TreePage extends ConsumerWidget {
               alignment: Alignment.centerRight,
               child: DropdownButton<String>(
                 value: selectedSearchValue,
-                items: ['고요나무', '예찬나무', '유요나무', '오예나무', '소윤나무']
+                style: AppTypography.buttonLabelXSmall.copyWith(color: AppColors.grayScale_850),
+                items: ['고요나무', '박예나무', '소윤나무', '수현나무', '승현나무', '시야나무', '예찬나무', '오예나무', '유요나무', '이현나무', '지현나무', '지훈나무']
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
                 onChanged: (newValue) {

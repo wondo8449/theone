@@ -20,7 +20,12 @@ class SharingPage extends ConsumerWidget {
     }
 
     return Scaffold(
-      body: Padding(
+      body: RefreshIndicator(
+        onRefresh: () async {
+      await ref.read(QTSharingProvider.notifier).refresh();
+      await ref.read(invitationSharingProvider.notifier).refresh();
+      },
+      child: Padding(
           padding: AppSpacing.medium16,
           child: ListView(
             children: [
@@ -69,50 +74,47 @@ class SharingPage extends ConsumerWidget {
                   ),
                   QTSharingList.when(
                     data: (QTsharings) {
-                      return SizedBox(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: min(QTsharings.length, 3),
-                          itemBuilder: (context, index) {
-                            final QTSharing = QTsharings[index];
-                            String formattedDate = formatDate(QTSharing['createdAt']);
-
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/QTSharingdetail', arguments: QTSharing['sharingId']);
-                              },
-                              child: Card(
-                                color: Colors.white,
-                                margin: AppSpacing.small4,
-                                child: Padding(
-                                  padding: AppSpacing.small12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(QTSharing['title'], style: AppTypography.headline6),
-                                          Text(
-                                            "$formattedDate  " + QTSharing['userName'],
-                                            style: AppTypography.body3,
-                                          ),
-                                        ],
-                                      ),
-                                      Text(QTSharing['content'], style: AppTypography.body2),
-                                    ],
-                                  ),
+                      return Column(
+                        children: QTsharings.take(3).map((QTSharing) {
+                          String formattedDate = formatDate(QTSharing['createdAt']);
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/QTSharingdetail',
+                                arguments: QTSharing['sharingId'],
+                              );
+                            },
+                            child: Card(
+                              color: Colors.white,
+                              margin: AppSpacing.small4,
+                              child: Padding(
+                                padding: AppSpacing.small12,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(QTSharing['title'], style: AppTypography.headline6),
+                                        Text(
+                                          "$formattedDate  ${QTSharing['userName']}",
+                                          style: AppTypography.body3,
+                                        ),
+                                      ],
+                                    ),
+                                    Text(QTSharing['content'], style: AppTypography.body2),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        }).toList(),
                       );
                     },
                     loading: () => Center(child: CircularProgressIndicator()),
                     error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
                   )
-
                 ]
               ),
               SizedBox(height: 16),
@@ -135,44 +137,42 @@ class SharingPage extends ConsumerWidget {
                   ),
                   invitationSharingList.when(
                     data: (invitationSharings) {
-                      return SizedBox(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: min(invitationSharings.length, 3),
-                          itemBuilder: (context, index) {
-                            final invitationSharing = invitationSharings[index];
-                            String formattedDate = formatDate(invitationSharing['createdAt']);
-
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(context, '/InvitationSharingDetail', arguments: invitationSharing['sharingId']);
-                              },
-                              child: Card(
-                                color: Colors.white,
-                                margin: AppSpacing.small4,
-                                child: Padding(
-                                  padding: AppSpacing.small12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(invitationSharing['title'], style: AppTypography.headline6),
-                                          Text(
-                                            "$formattedDate  " + invitationSharing['userName'],
-                                            style: AppTypography.body3,
-                                          ),
-                                        ],
-                                      ),
-                                      Text(invitationSharing['content'], style: AppTypography.body2),
-                                    ],
-                                  ),
+                      return Column(
+                        children: invitationSharings.take(3).map((invitationSharing) {
+                          String formattedDate = formatDate(invitationSharing['createdAt']);
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.pushNamed(
+                                context,
+                                '/InvitationSharingDetail',
+                                arguments: invitationSharing['sharingId'],
+                              );
+                            },
+                            child: Card(
+                              color: Colors.white,
+                              margin: AppSpacing.small4,
+                              child: Padding(
+                                padding: AppSpacing.small12,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(invitationSharing['title'], style: AppTypography.headline6),
+                                        Text(
+                                          "$formattedDate  ${invitationSharing['userName']}",
+                                          style: AppTypography.body3,
+                                        ),
+                                      ],
+                                    ),
+                                    Text(invitationSharing['content'], style: AppTypography.body2),
+                                  ],
                                 ),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        }).toList(),
                       );
                     },
                     loading: () => Center(child: CircularProgressIndicator()),
@@ -182,6 +182,7 @@ class SharingPage extends ConsumerWidget {
               )
             ],
           ),
+      )
       )
     );
   }

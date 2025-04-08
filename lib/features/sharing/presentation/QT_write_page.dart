@@ -13,7 +13,9 @@ class QTWritePage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: Text('QT 나눔 작성', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true, automaticallyImplyLeading:true),
-      body: Padding(
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Padding(
         padding: EdgeInsets.all(16),
         child: ListView(
           children: [
@@ -34,8 +36,8 @@ class QTWritePage extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(8.0),
                 ),
               ),
-              maxLines: null,
-              minLines: 10,
+              maxLines: 17,
+              minLines: 17,
             ),
             SizedBox(height: 16),
 
@@ -70,7 +72,8 @@ class QTWritePage extends ConsumerWidget {
             ),
           ],
         ),
-      ),
+      )
+      )
     );
   }
 
@@ -84,8 +87,13 @@ class QTWritePage extends ConsumerWidget {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushNamed(context, '/invitationDetail', arguments: id);
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+                Future.microtask(() {
+                  Navigator.of(context).pushReplacementNamed(
+                    '/QTSharingdetail',
+                    arguments: id,
+                  );
+                });
               },
               child: Text('확인'),
             ),
@@ -94,6 +102,8 @@ class QTWritePage extends ConsumerWidget {
       },
     );
   }
+
+
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
