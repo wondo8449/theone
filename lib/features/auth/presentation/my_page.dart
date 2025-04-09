@@ -30,6 +30,10 @@ class MyPage extends ConsumerWidget {
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Text(
+            '권한 : $role',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          Text(
               'headline1',
             style: AppTypography.headline1
           ),

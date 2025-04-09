@@ -58,6 +58,7 @@ class _StackPageState extends ConsumerState<StackPage> {
           children: [
             SharingPage(),
             InvitationPage(),
+
             TreePage(),
             MyPage(),
           ],

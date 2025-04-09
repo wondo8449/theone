@@ -29,12 +29,13 @@ class AuthNotifier extends StateNotifier<Map<String, String?>> {
     final decodedToken = JwtDecoder.decode(token);
     final role = decodedToken['role'] ?? '';
     final loginId = decodedToken['sub'] ?? "";
-    print('login - isAccepted : ' + isAccepted.toString());
+
     state = {'token': token, 'role': role, 'loginId': loginId, 'isAccepted': isAccepted.toString()};
   }
 
   Future<void> accept() async {
     await storage.write(key: 'isAccepted', value: "true");
+    state = {...state, 'isAccepted': "true"};
   }
 
   Future<void> logout() async {

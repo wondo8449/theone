@@ -37,7 +37,7 @@ class AuthApi {
   }
 
   Future<void> accept() async {
-    final responseRaw = await apiClient.request('GET', '/user/terms', {'isAccepted': true});
+    final responseRaw = await apiClient.request('POST', '/user/terms', {'isAccepted': true});
     if(responseRaw.statusCode != 200) {
       throw Exception('동의 실패');
     }
