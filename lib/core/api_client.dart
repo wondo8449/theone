@@ -38,7 +38,11 @@ class ApiClient {
         throw Exception('Unsupported HTTP method');
     }
 
-    return response;
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return response;
+    } else {
+      throw Exception('API 요청 실패: ${response.body}');
+    }
   }
 
 
@@ -49,7 +53,7 @@ class ApiClient {
     final response = await http.post(url, headers: headers, body: jsonEncode(body));
 
     if (response.statusCode == 200) {
-      return response; // 헤더도 사용 가능하도록 전체 응답 반환
+      return response;
     } else {
       throw Exception('API 요청 실패: ${response.body}');
     }

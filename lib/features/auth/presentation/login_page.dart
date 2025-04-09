@@ -16,14 +16,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final authApi = ref.read(authApiProvider);
 
     try {
+      print('로그인 시도');
       await authApi.login(
         ref,
         _usernameController.text,
         _passwordController.text,
       );
-      Navigator.pushReplacementNamed(context, '/');
+
+      final authState = ref.read(authProvider);
+
+      final isAccepted = authState['isAccepted'];
+      print('isAccepted : ' + isAccepted!);
+
+      if (isAccepted == "false") {
+        Navigator.pushReplacementNamed(context, '/accepted');
+      } else {
+        Navigator.pushReplacementNamed(context, '/');
+      }
     } catch (e) {
-      // 로그인 실패 시 Snackbar 알림
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('로그인 실패: 아이디 또는 비밀번호를 확인하세요.'),

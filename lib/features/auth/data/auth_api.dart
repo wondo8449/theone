@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:theone/core/api_client.dart';
@@ -17,16 +19,30 @@ class AuthApi {
       });
 
       final authHeader = response.headers['authorization'];
+      final decodedResponse = jsonDecode(utf8.decode(response.bodyBytes));
+      final data = decodedResponse['data'];
+
+      final isAccepted = data['termsAccepted'];
+
       if (authHeader != null && authHeader.startsWith('Bearer ')) {
         final token = authHeader.substring(7);
-        ref.read(authProvider.notifier).login(token);
+        ref.read(authProvider.notifier).login(token, isAccepted);
       } else {
         throw Exception('토큰이 응답 헤더에 없습니다.');
       }
     } catch (e) {
+      print('error : ' + e.toString());
       throw Exception('로그인 실패');
     }
   }
+
+  Future<void> accept() async {
+    final responseRaw = await apiClient.request('GET', '/user/terms', {'isAccepted': true});
+    if(responseRaw.statusCode != 200) {
+      throw Exception('동의 실패');
+    }
+  }
+
 }
 
 final authApiProvider = Provider<AuthApi>((ref) {

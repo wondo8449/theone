@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../auth/provider/auth_provider.dart';
@@ -12,21 +11,11 @@ class QTSharingDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final int id = ModalRoute.of(context)!.settings.arguments as int;
     final authState = ref.watch(authProvider);
-    final token = authState['token'];
+    final loginId = authState['loginId'];
 
     String formatDate(String timestamp) {
       DateTime date = DateTime.parse(timestamp);
       return DateFormat('yyyy년 M월 d일').format(date);
-    }
-
-    String loginId = "";
-    if (token != null && token.isNotEmpty) {
-      try {
-        Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
-        loginId = decodedToken['sub'] ?? "";
-      } catch (e) {
-        loginId = "토큰 오류";
-      }
     }
 
     final QTDetail = ref.watch(sharingDetailProvider(id));
@@ -59,6 +48,7 @@ class QTSharingDetailPage extends ConsumerWidget {
                 ),
                 SizedBox(height: 16),
                 Text('내용', style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+                SizedBox(height: 16),
                 TextField(
                   controller: contentController,
                   decoration: InputDecoration(

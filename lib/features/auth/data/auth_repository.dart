@@ -8,6 +8,10 @@ class AuthRepository {
   Future<void> login(WidgetRef ref, String username, String password) async {
     await authApi.login(ref, username, password);
   }
+
+  Future<void> accept() async {
+    await authApi.accept();
+  }
 }
 
 final authRepositoryProvider = Provider<AuthRepository>((ref) {

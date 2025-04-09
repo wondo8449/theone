@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:theone/features/auth/presentation/accepted_page.dart';
 import 'package:theone/features/auth/presentation/my_page.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
 import 'package:theone/features/auth/presentation/login_page.dart';
@@ -24,17 +25,21 @@ void main() {
 class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // authProvider의 상태를 확인
-    final token = ref.watch(authProvider); // 로그인 상태를 확인 (token이 null이면 로그인 안 된 상태)
+    final authState = ref.watch(authProvider);
+    final token = authState['token'];
+    final isAccepted = authState['isAccepted'];
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.themeData,
       home: token == null || token.isEmpty
-          ? LoginPage()  // 토큰이 없으면 로그인 페이지로
-          : StackPage(initialIndex: 0),  // 토큰이 있으면 메인 페이지로
+          ? LoginPage()
+          : isAccepted == "false"
+          ? AcceptedPage()
+          : StackPage(initialIndex: 0),
       routes: {
         '/login' : (context) => LoginPage(),
+        '/accepted': (context) => AcceptedPage(),
         '/mypage': (context) => MyPage(),
         '/QTwrite': (context) => QTWritePage(),
         '/invitationWrite': (context) => InvitationWritePage(),
