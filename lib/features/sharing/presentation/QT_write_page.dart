@@ -25,8 +25,8 @@ class QTWritePage extends ConsumerWidget {
               decoration: InputDecoration(hintText: '제목을 입력해주세요.'),
             ),
             SizedBox(height: 16),
-
             Text('내용', style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+            SizedBox(height: 16),
             TextField(
               controller: contentController,
               decoration: InputDecoration(

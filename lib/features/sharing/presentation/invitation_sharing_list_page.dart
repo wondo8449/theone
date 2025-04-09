@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:theone/core/constants/app_colors.dart';
 import 'package:theone/core/constants/app_spacing.dart';
 import 'package:theone/core/constants/app_typography.dart';
-import '../../../core/constants/app_border_radius.dart';
 import 'package:theone/features/sharing/provider/sharing_provider.dart';
 
 class InvitationSharingListPage extends ConsumerWidget {
@@ -18,66 +17,90 @@ class InvitationSharingListPage extends ConsumerWidget {
     }
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text('풍삶초 나눔 목록', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)),
-          centerTitle: true,
-          automaticallyImplyLeading: true,
+      appBar: AppBar(
+        title: Text(
+          '풍삶초 나눔 목록',
+          style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950),
         ),
-        body: RefreshIndicator(
-            onRefresh: () async {
-              await ref.read(QTSharingProvider.notifier).refresh();
-            },
-            child: Padding(
-                padding: AppSpacing.medium16,
-                child: ListView(
-                  children: [
-                    invitationSharingList.when(
-                      data: (invitationSharings) {
-                        return Column(
-                          children: invitationSharings.map((invitationSharing) {
-                            String formattedDate = formatDate(invitationSharing['createdAt']);
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.pushNamed(
-                                  context,
-                                  '/InvitationSharingDetail',
-                                  arguments: invitationSharing['sharingId'],
-                                );
-                              },
-                              child: Card(
-                                color: Colors.white,
-                                margin: AppSpacing.small4,
-                                child: Padding(
-                                  padding: AppSpacing.small12,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(invitationSharing['title'], style: AppTypography.headline6),
-                                          Text(
-                                            "$formattedDate  ${invitationSharing['userName']}",
-                                            style: AppTypography.body3,
-                                          ),
-                                        ],
-                                      ),
-                                      Text(invitationSharing['content'], style: AppTypography.body2, maxLines: 3),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
-                        );
-                      },
-                      loading: () => Center(child: CircularProgressIndicator()),
-                      error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
-                    )
-                  ],
-                )
-            )
-        )
+        centerTitle: true,
+        automaticallyImplyLeading: true,
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await ref.read(QTSharingProvider.notifier).refresh();
+        },
+        child: invitationSharingList.when(
+          data: (invitationSharings) {
+            Map<String, List<Map<String, dynamic>>> groupedData = {};
+            for (var sharing in invitationSharings) {
+              String date = formatDate(sharing['createdAt']);
+              groupedData.putIfAbsent(date, () => []).add(sharing);
+            }
+            final sortedDates = groupedData.keys.toList()
+              ..sort((a, b) => DateFormat('yyyy년 M월 d일')
+                  .parse(b)
+                  .compareTo(DateFormat('yyyy년 M월 d일').parse(a)));
+            List<Widget> listItems = [];
+            for (var date in sortedDates) {
+              listItems.add(
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    date,
+                    style: AppTypography.headline5.copyWith(color: AppColors.primary_450),
+                  ),
+                ),
+              );
+              for (var sharing in groupedData[date]!) {
+                listItems.add(
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        '/InvitationSharingDetail',
+                        arguments: sharing['sharingId'],
+                      );
+                    },
+                    child: Card(
+                      color: Colors.white,
+                      margin: AppSpacing.small4,
+                      child: Padding(
+                        padding: AppSpacing.small12,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(sharing['title'], style: AppTypography.headline6),
+                                Text(sharing['userName'], style: AppTypography.body3),
+                              ],
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              sharing['content'],
+                              style: AppTypography.body2,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              listItems.add(SizedBox(height: 16));
+            }
+            return ListView(
+              padding: AppSpacing.medium16,
+              children: listItems,
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
+        ),
+      ),
     );
   }
 }
