@@ -58,7 +58,7 @@ class TreePage extends ConsumerWidget {
                   ),
                 ),
               ),
-              if(role == "ADMIN")
+              if(role == "ADMIN" || role == "DIRECTOR")
                 Align(
                   alignment: Alignment.centerRight,
                   child: DropdownButton<String>(
@@ -120,7 +120,7 @@ class TreePage extends ConsumerWidget {
                                 )
                                     : Text(comment['comment'], style: AppTypography.body1.copyWith(color: AppColors.grayScale_550)),
                                 SizedBox(height: 8),
-                                if(role == "USER")
+                                if(role == "LEADER")
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [

@@ -7,18 +7,6 @@ import 'package:theone/features/sharing/data/sharing_repository.dart';
 final sharingApiProvider = Provider((ref) => SharingApi(ref.read(apiClientProvider)));
 final sharingRepositoryProvider = Provider((ref) => SharingRepository(ref.read(sharingApiProvider)));
 
-// final QTSharingProvider = FutureProvider.autoDispose((ref) async {
-//   final repository = ref.read(sharingRepositoryProvider);
-//
-//   return await repository.getQTSharingList();
-// });
-
-// final invitationSharingProvider = FutureProvider.autoDispose((ref) async {
-//   final repository = ref.read(sharingRepositoryProvider);
-//
-//   return await repository.getInvitationSharingList();
-// });
-
 final titleControllerProvider = StateProvider.autoDispose<TextEditingController>((ref) {
   return TextEditingController();
 });

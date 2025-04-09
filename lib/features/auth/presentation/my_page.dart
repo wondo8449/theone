@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:theone/core/constants/app_colors.dart';
+import 'package:theone/core/constants/app_spacing.dart';
 import 'package:theone/core/constants/app_typography.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
 
@@ -178,13 +179,16 @@ class MyPage extends ConsumerWidget {
               style: AppTypography.body1.copyWith(color: AppColors.deepYellow)
           ),
           const SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () async {
-              await ref.read(authProvider.notifier).logout();
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-            child: const Text('로그아웃'),
-          ),
+          Padding(
+              padding: AppSpacing.medium16,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await ref.read(authProvider.notifier).logout();
+                  Navigator.pushReplacementNamed(context, '/login');
+                },
+                child: const Text('로그아웃'),
+              ),
+          )
         ],
       ),
     );

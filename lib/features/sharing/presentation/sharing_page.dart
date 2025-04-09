@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -63,7 +62,7 @@ class SharingPage extends ConsumerWidget {
                      Text('QT 나눔', style: AppTypography.headline4),
                      TextButton(
                          onPressed: () {
-
+                           Navigator.pushNamed(context, '/QTSharingList');
                          },
                          style: ButtonStyle(
                              minimumSize: WidgetStateProperty.all<Size>(Size(30, 20)),
@@ -103,7 +102,7 @@ class SharingPage extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    Text(QTSharing['content'], style: AppTypography.body2),
+                                    Text(QTSharing['content'], style: AppTypography.body2, maxLines: 3),
                                   ],
                                 ),
                               ),
@@ -126,7 +125,7 @@ class SharingPage extends ConsumerWidget {
                       Text('풍삶초 나눔', style: AppTypography.headline4),
                       TextButton(
                           onPressed: () {
-
+                            Navigator.pushNamed(context, '/invitationSharingList');
                           },
                           style: ButtonStyle(
                               minimumSize: WidgetStateProperty.all<Size>(Size(30, 20)),
@@ -166,7 +165,7 @@ class SharingPage extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    Text(invitationSharing['content'], style: AppTypography.body2),
+                                    Text(invitationSharing['content'], style: AppTypography.body2, maxLines: 3),
                                   ],
                                 ),
                               ),

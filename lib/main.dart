@@ -6,11 +6,14 @@ import 'package:theone/features/auth/presentation/my_page.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
 import 'package:theone/features/auth/presentation/login_page.dart';
 import 'package:theone/features/sharing/presentation/QT_sharing_detail_page.dart';
+import 'package:theone/features/sharing/presentation/QT_sharing_list_page.dart';
 import 'package:theone/features/sharing/presentation/QT_write_page.dart';
 import 'package:theone/features/sharing/presentation/invitation_sharing_detail_page.dart';
 import 'package:theone/features/sharing/presentation/invitation_write_page.dart';
 import 'package:theone/theme.dart';
 import 'package:theone/widgets/stack_page.dart';
+
+import 'features/sharing/presentation/invitation_sharing_list_page.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -44,7 +47,9 @@ class MyApp extends ConsumerWidget {
         '/QTwrite': (context) => QTWritePage(),
         '/invitationWrite': (context) => InvitationWritePage(),
         '/InvitationSharingDetail': (context) => InvitationSharingDetailPage(),
-        '/QTSharingdetail': (context) => QTSharingDetailPage()
+        '/QTSharingdetail': (context) => QTSharingDetailPage(),
+        '/QTSharingList': (context) => QTSharingListPage(),
+        '/invitationSharingList': (context) => InvitationSharingListPage()
       },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
