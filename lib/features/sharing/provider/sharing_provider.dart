@@ -20,12 +20,23 @@ final sendSharingDataProvider = FutureProvider.autoDispose.family<Map<String, dy
   return await repository.createSharing(data);
 });
 
+final modifySharingDataProvider = FutureProvider.family<void, (int, Map<String, dynamic>)>((ref, tuple) async {
+  final repo = ref.read(sharingRepositoryProvider);
+  final id = tuple.$1;
+  final data = tuple.$2;
+  await repo.modifySharing(id, data);
+});
+
 final sharingDetailProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, int>((ref, id) async {
   final repository = ref.read(sharingRepositoryProvider);
   return await repository.getSharingDetail(id);
 });
 
-// provider/sharing_provider.dart
+final deleteSharingProvider = FutureProvider.autoDispose.family<void, int>((ref, id) async {
+  final repository = ref.read(sharingRepositoryProvider);
+  await repository.deleteSharing(id);
+});
+
 
 class QTSharingNotifier extends AsyncNotifier<List<Map<String, dynamic>>> {
   @override

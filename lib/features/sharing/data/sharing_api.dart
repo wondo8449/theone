@@ -66,20 +66,56 @@ class SharingApi {
   }
 
   Future<Map<String, dynamic>> getSharingDetail(int id) async {
-    final responseRaw = await apiClient.request('GET', '/sharing/detail/$id', null);
-    final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
+    try {
+      final responseRaw = await apiClient.request('GET', '/sharing/detail/$id', null);
+      final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
 
-    if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
-      final data = decodedResponse['data'];
-      return {
-        'sharingId': data['sharingId'],
-        'userName': data['userName'],
-        'title': data['title'] ?? '',
-        'content': data['content'] ?? '',
-        'createdAt': data['createdAt'],
-      };
-    } else {
-      throw Exception('Invalid response format: $decodedResponse');
+      if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
+        final data = decodedResponse['data'];
+        return {
+          'sharingId': data['sharingId'],
+          'userName': data['userName'],
+          'title': data['title'] ?? '',
+          'content': data['content'] ?? '',
+          'createdAt': data['createdAt'],
+        };
+      } else {
+        throw Exception('Invalid response format: $decodedResponse');
+      }
+    } catch(e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> modifySharing(int id, Map<String, dynamic> data) async {
+    try{
+      final responseRaw = await apiClient.request('PATCH', '/sharing/$id', data);
+      final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
+
+      if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
+        final data = decodedResponse['data'];
+        return {
+          'sharingId': data['sharingId'],
+          'userName': data['userName'],
+          'title': data['title'] ?? '',
+          'content': data['content'] ?? '',
+          'createdAt': data['createdAt'],
+        };
+      } else {
+        throw Exception('Invalid response format: $decodedResponse');
+      }
+    } catch(e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<void> deleteSharing(int id) async {
+    try{
+      final responseRaw = await apiClient.request('DELETE', '/sharing/$id', null);
+      final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
+
+    } catch(e) {
+      throw Exception(e);
     }
   }
 

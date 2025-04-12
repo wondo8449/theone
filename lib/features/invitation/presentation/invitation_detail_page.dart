@@ -126,7 +126,6 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
                   },
                   child: Text('수정하기'),
                 ),
-
               ],
             );
           },

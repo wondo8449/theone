@@ -21,4 +21,12 @@ class SharingRepository {
     return sharingApi.getSharingDetail(id);
   }
 
+  Future<Map<String, dynamic>> modifySharing(int id, Map<String, dynamic> data) {
+    return sharingApi.modifySharing(id, data);
+  }
+
+  Future<void> deleteSharing(int id) {
+    return sharingApi.deleteSharing(id);
+  }
+
 }

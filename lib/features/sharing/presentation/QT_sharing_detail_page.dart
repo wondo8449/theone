@@ -1,4 +1,3 @@
-// 기존 import들 유지
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../auth/provider/auth_provider.dart';
 import '../provider/sharing_provider.dart';
+import 'package:flutter/cupertino.dart';
 
 class QTSharingDetailPage extends ConsumerWidget {
   @override
@@ -131,8 +131,25 @@ class QTSharingDetailPage extends ConsumerWidget {
                           return;
                         }
 
-                        final data = {'id': id, 'title': title, 'content': content, 'sectionCode': "INVITATION"};
-                        ref.read(sendSharingDataProvider(data));
+                        final data = {'title': title, 'content': content};
+
+                        ref.read(modifySharingDataProvider((id, data)).future).then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('수정이 완료되었습니다.'),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        }).catchError((error) {
+                          print('수정 실패: $error');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('수정에 실패했습니다.'),
+                              backgroundColor: Colors.red,
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        });
                       },
                       child: Text('수정하기'),
                     ),
@@ -149,46 +166,67 @@ class QTSharingDetailPage extends ConsumerWidget {
 
   void _handleMenuSelection(
       BuildContext context, String value, Map<String, dynamic> data, WidgetRef ref) {
+    final int id = data['sharingId'];
+
     if (value == 'report') {
-      showDialog(
+      showCupertinoDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => CupertinoAlertDialog(
           title: Text('신고하기'),
           content: Text('해당 나눔을 신고하시겠습니까?'),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () => Navigator.pop(context),
               child: Text('취소'),
             ),
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () {
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('신고가 접수되었습니다.')));
-                // TODO: 실제 신고 API 연동
+                // TODO: 신고 API 연동
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('신고가 접수되었습니다.')),
+                );
               },
+              isDestructiveAction: true,
               child: Text('신고'),
             ),
           ],
         ),
       );
     } else if (value == 'delete') {
-      showDialog(
+      showCupertinoDialog(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => CupertinoAlertDialog(
           title: Text('삭제하기'),
-          content: Text('정말 삭제하시겠습니까?'),
+          content: Text('정말 삭제하시겠습니까?\n삭제 후 되돌릴 수 없습니다.'),
           actions: [
-            TextButton(
+            CupertinoDialogAction(
               onPressed: () => Navigator.pop(context),
               child: Text('취소'),
             ),
-            TextButton(
-              onPressed: () {
+            CupertinoDialogAction(
+              onPressed: () async {
                 Navigator.pop(context);
-                // TODO: 실제 삭제 API 연동
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('삭제가 완료되었습니다.')));
-                Navigator.pop(context);
+
+                try {
+                  await ref.read(deleteSharingProvider(id).future);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('삭제가 완료되었습니다.')),
+                  );
+
+                  Navigator.pop(context);
+                } catch (error) {
+                  print('삭제 실패: $error');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('삭제에 실패했습니다.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
+              isDestructiveAction: true,
               child: Text('삭제'),
             ),
           ],
@@ -196,6 +234,7 @@ class QTSharingDetailPage extends ConsumerWidget {
       );
     }
   }
+
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
