@@ -29,4 +29,8 @@ class SharingRepository {
     return sharingApi.deleteSharing(id);
   }
 
+  Future<void> declarationSharing(int id) {
+    return sharingApi.declarationSharing(id);
+  }
+
 }

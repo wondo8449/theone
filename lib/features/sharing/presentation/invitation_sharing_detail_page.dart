@@ -193,12 +193,25 @@ class InvitationSharingDetailPage extends ConsumerWidget {
               child: Text('취소'),
             ),
             CupertinoDialogAction(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(context);
-                // TODO: 신고 API 연동
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('신고가 접수되었습니다.')),
-                );
+
+                try {
+                  await ref.read(declarationSharingProvider(id).future);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('신고가 접수되었습니다.')),
+                  );
+
+                } catch(e) {
+                  print('신고 실패: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('신고에 실패했습니다.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               isDestructiveAction: true,
               child: Text('신고'),

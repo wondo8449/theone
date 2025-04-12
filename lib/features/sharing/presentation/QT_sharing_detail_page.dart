@@ -180,12 +180,26 @@ class QTSharingDetailPage extends ConsumerWidget {
               child: Text('취소'),
             ),
             CupertinoDialogAction(
-              onPressed: () {
-                Navigator.pop(context);
-                // TODO: 신고 API 연동
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('신고가 접수되었습니다.')),
-                );
+              onPressed: () async {
+                final navigator = Navigator.of(context);
+                final messenger = ScaffoldMessenger.of(context);
+
+                navigator.pop();
+
+                try {
+                  await ref.read(declarationSharingProvider(id).future);
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('신고가 접수되었습니다.')),
+                  );
+                } catch (e) {
+                  print('신고 실패: $e');
+                  messenger.showSnackBar(
+                    SnackBar(
+                      content: Text('신고에 실패했습니다.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
               },
               isDestructiveAction: true,
               child: Text('신고'),
@@ -216,8 +230,8 @@ class QTSharingDetailPage extends ConsumerWidget {
                   );
 
                   Navigator.pop(context);
-                } catch (error) {
-                  print('삭제 실패: $error');
+                } catch (e) {
+                  print('삭제 실패: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('삭제에 실패했습니다.'),

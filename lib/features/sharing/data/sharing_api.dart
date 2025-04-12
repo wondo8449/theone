@@ -113,7 +113,15 @@ class SharingApi {
     try{
       final responseRaw = await apiClient.request('DELETE', '/sharing/$id', null);
       final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
+    } catch(e) {
+      throw Exception(e);
+    }
+  }
 
+  Future<void> declarationSharing(int id) async {
+    try{
+      final responseRaw = await apiClient.request('GET', '/declaration/$id', null);
+      final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
     } catch(e) {
       throw Exception(e);
     }

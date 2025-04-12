@@ -37,6 +37,10 @@ final deleteSharingProvider = FutureProvider.autoDispose.family<void, int>((ref,
   await repository.deleteSharing(id);
 });
 
+final declarationSharingProvider = FutureProvider.autoDispose.family<void, int>((ref, id) async {
+  final repository = ref.read(sharingRepositoryProvider);
+  await repository.declarationSharing(id);
+});
 
 class QTSharingNotifier extends AsyncNotifier<List<Map<String, dynamic>>> {
   @override
