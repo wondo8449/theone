@@ -30,6 +30,29 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
       appBar: AppBar(
         title: Text('풍삶초 상세', style: AppTypography.headline3),
         centerTitle: true,
+        automaticallyImplyLeading: true,
+        actions: [
+          invitationDetail.when(
+            data: (data) {
+              final invitationData = data as Map<String, dynamic>;
+              return PopupMenuButton<String>(
+                icon: Icon(Icons.more_vert, color: AppColors.grayScale_950),
+                onSelected: (value) =>
+                    _handleMenuSelection(context, value, invitationData, ref),
+                itemBuilder: (BuildContext context) {
+                  return [
+                    if (loginId != invitationData['userName'])
+                    PopupMenuItem(value: 'report', child: Text('신고하기')),
+                    if (loginId == invitationData['userName'])
+                      PopupMenuItem(value: 'delete', child: Text('삭제하기')),
+                  ];
+                },
+              );
+            },
+            loading: () => SizedBox.shrink(),
+            error: (error, stack) => SizedBox.shrink(),
+          ),
+        ]
       ),
       body: GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -137,6 +160,90 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
     );
   }
 
+  void _handleMenuSelection(
+      BuildContext context, String value, Map<String, dynamic> data, WidgetRef ref) {
+    final int id = data['invitationId'];
+
+    if (value == 'report') {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text('신고하기'),
+          content: Text('해당 나눔을 신고하시겠습니까?'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(context),
+              child: Text('취소'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () async {
+                Navigator.pop(context);
+
+                try {
+                  await ref.read(deleteInvitationProvider(id).future);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('신고가 접수되었습니다.')),
+                  );
+
+                } catch(e) {
+                  print('신고 실패: $e');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('신고에 실패했습니다.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              isDestructiveAction: true,
+              child: Text('신고'),
+            ),
+          ],
+        ),
+      );
+    } else if (value == 'delete') {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: Text('삭제하기'),
+          content: Text('정말 삭제하시겠습니까?\n삭제 후 되돌릴 수 없습니다.'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.pop(context),
+              child: Text('취소'),
+            ),
+            CupertinoDialogAction(
+              onPressed: () async {
+                Navigator.pop(context);
+
+                try {
+                  await ref.read(deleteInvitationProvider(id).future);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('삭제가 완료되었습니다.')),
+                  );
+
+                  Navigator.pop(context);
+                } catch (error) {
+                  print('삭제 실패: $error');
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('삭제에 실패했습니다.'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              isDestructiveAction: true,
+              child: Text('삭제'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   Widget _readOnlyField(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,6 +311,12 @@ class _DateFieldState extends State<DateField> {
     super.initState();
     selectedDate = DateTime.tryParse(widget.initialValue) ?? DateTime.now();
     displayText = DateFormat('yyyy년 M월 d일').format(selectedDate);
+
+    // ✅ 초기값 상태 반영
+    final formatted = DateFormat('yyyy-MM-dd').format(selectedDate);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      widget.ref.read(invitationEditControllerProvider.notifier).updateEditDataField(widget.keyName, formatted);
+    });
   }
 
   void _updateDate(DateTime newDate) {
@@ -247,7 +360,7 @@ class _DateFieldState extends State<DateField> {
                         mode: CupertinoDatePickerMode.date,
                         initialDateTime: selectedDate,
                         onDateTimeChanged: (DateTime newDate) {
-                          selectedDate = newDate; // setState는 완료 버튼 누를 때만
+                          selectedDate = newDate;
                         },
                       ),
                     ),

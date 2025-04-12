@@ -45,7 +45,7 @@ class _StackPageState extends ConsumerState<StackPage> {
       },
       child: Scaffold(
         appBar: PreferredSize(
-            preferredSize: Size.fromHeight(56),
+            preferredSize: Size.fromHeight(35),
             child: Column(
               children: [
                 SizedBox(height: statusBarHeight),

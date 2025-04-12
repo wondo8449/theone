@@ -10,7 +10,7 @@ class MainHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56,
+      height: 35,
       width: double.infinity,
       alignment: Alignment.centerLeft,
       child: Padding(

@@ -53,7 +53,7 @@ class SharingPage extends ConsumerWidget {
                       child: Text('+ 풍삶초 나눔 쓰기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.primary_450))),
                 ],
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 12),
               Column(
                 children: [
                   Row(

@@ -6,6 +6,7 @@ import 'package:theone/features/auth/presentation/my_page.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
 import 'package:theone/features/auth/presentation/login_page.dart';
 import 'package:theone/features/invitation/presentation/invitation_detail_page.dart';
+import 'package:theone/features/invitation/presentation/invitation_register_page.dart';
 import 'package:theone/features/sharing/presentation/QT_sharing_detail_page.dart';
 import 'package:theone/features/sharing/presentation/QT_sharing_list_page.dart';
 import 'package:theone/features/sharing/presentation/QT_write_page.dart';
@@ -71,6 +72,7 @@ class MyApp extends ConsumerWidget {
         '/login' : (context) => LoginPage(),
         '/accepted': (context) => AcceptedPage(),
         '/mypage': (context) => MyPage(),
+        '/invitationRegister': (context) => InvitationRegisterPage(),
         '/QTwrite': (context) => QTWritePage(),
         '/invitationWrite': (context) => InvitationWritePage(),
         '/invitationDetail': (context) => InvitationDetailPage(),

@@ -6,6 +6,27 @@ class InvitationApi {
   final ApiClient apiClient;
   InvitationApi(this.apiClient);
 
+  Future<Map<String, dynamic>> createInvitation(Map<String, dynamic> dto) async {
+    try {
+      final res = await apiClient.request('POST', '/invitation', dto);
+      final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
+      final data = decodeRes['data'];
+      return {
+        'invitationId': data['invitationId'],
+        'userId': data['userId'],
+        'userName': data['userName'],
+        'followerName': data['followerName'],
+        'startDate': data['startDate'],
+        'endDate': data['endDate'] ?? '',
+        'progress': data['progress'],
+        'createdAt': data['createdAt'],
+        'modifiedAt': data['modifiedAt']
+      };
+    } catch(e) {
+      throw Exception(e);
+    }
+  }
+
   Future<List<Map<String, dynamic>>> showInvitationList() async {
     final res = await apiClient.request('GET', '/invitation', null);
     final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
@@ -79,22 +100,10 @@ class InvitationApi {
     }
   }
 
-  Future<Map<String, dynamic>> deleteInvitation(int invitationId) async {
+  Future<void> deleteInvitation(int invitationId) async {
     try {
       final res = await apiClient.request('DELETE', '/invitation/$invitationId', null);
       final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
-      final data = decodeRes['data'];
-      return {
-        'invitationId': data['invitationId'],
-        'userId': data['userId'],
-        'userName': data['userName'],
-        'followerName': data['followerName'],
-        'startDate': data['startDate'],
-        'endDate': data['endDate'] ?? '',
-        'progress': data['progress'],
-        'createdAt': data['createdAt'],
-        'modifiedAt': data['modifiedAt']
-      };
     } catch(e) {
       throw Exception(e);
     }

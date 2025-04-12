@@ -5,6 +5,10 @@ class InvitationRepository {
 
   InvitationRepository(this.invitationApi);
 
+  Future<Map<String, dynamic>> createInvitation(Map<String, dynamic> dto) {
+    return invitationApi.createInvitation(dto);
+  }
+
   Future<List<Map<String, dynamic>>> showInvitationList() async {
     return await invitationApi.showInvitationList();
   }
@@ -17,7 +21,7 @@ class InvitationRepository {
     return invitationApi.editInvitation(invitationId, dto);
   }
 
-  Future<Map<String, dynamic>> deleteInvitation(int id) {
+  Future<void> deleteInvitation(int id) {
     return invitationApi.deleteInvitation(id);
   }
 

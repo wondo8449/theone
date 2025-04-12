@@ -14,10 +14,30 @@ class InvitationPage extends ConsumerWidget {
     final invitationList = ref.watch(invitationListProvider);
 
     return Scaffold(
-      body: Padding(
+      body: RefreshIndicator(
+        onRefresh: () async {
+      await ref.read(invitationListProvider.notifier).refresh();
+      },
+      child: Padding(
         padding: AppSpacing.small8,
         child: Column(
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/invitationRegister');
+                    },
+                    style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
+                        minimumSize: WidgetStateProperty.all<Size>(Size(80, 35)),
+                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
+                        )),
+                    child: Text('+ 작성하기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.primary_450)))
+              ]
+            ),
+            SizedBox(width: 16),
             Expanded(
               child: invitationList.when(
                 data: (res) {
@@ -85,6 +105,7 @@ class InvitationPage extends ConsumerWidget {
           ],
         ),
       ),
+    )
     );
 
   }

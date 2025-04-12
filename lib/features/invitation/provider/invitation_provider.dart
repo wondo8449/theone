@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:theone/core/api_client_provider.dart';
-import 'package:theone/features/auth/provider/auth_provider.dart';
 import 'package:theone/features/invitation/data/invitation_api.dart';
 import 'package:theone/features/invitation/data/invitation_repository.dart';
 import 'package:flutter/material.dart';
@@ -9,13 +8,31 @@ final invitationApiProvider = Provider((ref) => InvitationApi(ref.read(apiClient
 final invitationRepositoryProvider = Provider((ref) => InvitationRepository(ref.read(invitationApiProvider)));
 final invitationStatusProvider = StateProvider<String>((ref) => '진행중');
 
-final invitationListProvider = FutureProvider.autoDispose((ref) async {
-  final repository = ref.read(invitationRepositoryProvider);
-
-  final authState = ref.watch(authProvider);
-
-  return await repository.showInvitationList();
+final createInvitationProvider = FutureProvider.family<void, Map<String, dynamic>>((ref, data) async {
+  final repo = ref.read(invitationRepositoryProvider);
+  await repo.createInvitation(data);
 });
+
+class InvitationListNotifier extends AsyncNotifier<List<Map<String, dynamic>>> {
+  @override
+  Future<List<Map<String, dynamic>>> build() async {
+    final repository = ref.read(invitationRepositoryProvider);
+    return await repository.showInvitationList();
+  }
+
+  Future<void> refresh() async {
+    state = const AsyncLoading();
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(invitationRepositoryProvider);
+      return await repository.showInvitationList();
+    });
+  }
+}
+
+final invitationListProvider =
+AsyncNotifierProvider<InvitationListNotifier, List<Map<String, dynamic>>>(
+        () => InvitationListNotifier());
+
 
 final invitationEditProvider = StateProvider<int?>((ref) => null);
 
@@ -38,9 +55,9 @@ final sendInvitationUpdateProvider = FutureProvider.family<void, (Map<String, dy
   await repo.updateInvitation(id, data);
 });
 
-final deleteInvitationProvider = Provider.family<void, int>((ref, id) {
+final deleteInvitationProvider = FutureProvider.autoDispose.family<void, int>((ref, id) async {
   final repo = ref.read(invitationRepositoryProvider);
-  repo.deleteInvitation(id);
+  await repo.deleteInvitation(id);
 });
 
 class InvitationEditController extends StateNotifier<Map<int, TextEditingController?>> {
