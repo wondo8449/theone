@@ -1,201 +1,274 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:theone/core/constants/app_colors.dart';
 import 'package:theone/core/constants/app_spacing.dart';
 import 'package:theone/core/constants/app_typography.dart';
-import 'package:theone/core/constants/app_colors.dart';
-import 'package:theone/core/constants/app_border_radius.dart';
 import 'package:theone/features/invitation/provider/invitation_provider.dart';
+import '../../../core/constants/app_border_radius.dart';
+import '../../auth/provider/auth_provider.dart';
 
-class InvitationDetailPage extends ConsumerWidget {
-  final String invitationId;
+class InvitationDetailPage extends ConsumerStatefulWidget {
+  @override
+  ConsumerState<InvitationDetailPage> createState() => _InvitationDetailPageState();
+}
 
-  const InvitationDetailPage({super.key, required this.invitationId});
+class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
+  bool _isInitialized = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final invitationList = ref.watch(invitationListProvider);
-    final editData = ref.watch(invitationEditDataProvider);
+  Widget build(BuildContext context) {
+    final int id = ModalRoute.of(context)!.settings.arguments as int;
+    final authState = ref.watch(authProvider);
+    final loginId = authState['loginId'];
 
-    final int parsedId = int.tryParse(invitationId) ?? -1;
-
-    final invitation = invitationList.whenOrNull(
-      data: (res) => res.firstWhere(
-            (inv) => inv['invitationId'] == parsedId,
-        orElse: () => {},
-      ),
-    );
-
-    if (invitation == null) {
-      return Scaffold(
-        appBar: AppBar(title: Text('풍삶초 상세 정보', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true),
-        body: Center(child: Text('풍삶초 정보를 찾을 수 없습니다.')),
-      );
-    }
-
-    // 초기 상태 세팅
-    ref.listenManual(invitationEditDataProvider, (previous, next) {});
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(invitationEditDataProvider.notifier).state = {
-        'invitationId': invitation['invitationId'],
-        'followerName': invitation['followerName'],
-        'oneWeekL': invitation['oneWeekL'],
-        'oneWeekF': invitation['oneWeekF'],
-        'oneWeekDate': invitation['oneWeekDate'],
-        'twoWeekL': invitation['twoWeekL'],
-        'twoWeekF': invitation['twoWeekF'],
-        'twoWeekDate': invitation['twoWeekDate'],
-        'threeWeekL': invitation['threeWeekL'],
-        'threeWeekF': invitation['threeWeekF'],
-        'threeWeekDate': invitation['threeWeekDate'],
-        'fourWeekL': invitation['fourWeekL'],
-        'fourWeekF': invitation['fourWeekF'],
-        'fourWeekDate': invitation['fourWeekDate'],
-        'fiveWeekL': invitation['fiveWeekL'],
-        'fiveWeekF': invitation['fiveWeekF'],
-        'fiveWeekDate': invitation['fiveWeekDate'],
-        'sixWeekL': invitation['sixWeekL'],
-        'sixWeekF': invitation['sixWeekF'],
-        'sixWeekDate': invitation['sixWeekDate'],
-        'startDate': invitation['startDate'],
-        'endDate': invitation['endDate'],
-        'progress': invitation['progress'], // 0, 1, 2 중 하나
-      };
-    });
+    final invitationDetail = ref.watch(invitationDetailProvider(id));
+    final progressState = ref.watch(invitationStatusProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('풍삶초 상세 정보', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: [
-            _dropdownProgress(ref),
-            _dateField(ref, 'startDate', '시작일자'),
-            _dateField(ref, 'endDate', '종료일자'),
+      appBar: AppBar(
+        title: Text('풍삶초 상세', style: AppTypography.headline3),
+        centerTitle: true,
+      ),
+      body: GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+        child: Padding(
+        padding: AppSpacing.medium16,
+        child: invitationDetail.when(
+          data: (data) {
+            // 딱 한 번만 초기화
+            if (!_isInitialized) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                ref.read(invitationEditControllerProvider.notifier).initializeEditData(data);
+              });
+              _isInitialized = true;
+            }
 
-            for (int i = 1; i <= 6; i++)
-              _weekSection(ref, i),
+            final editController = ref.watch(invitationEditControllerProvider);
 
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                final data = ref.read(invitationEditDataProvider);
+            return ListView(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    _readOnlyField('이끄미', data['userName']),
+                    SizedBox(width: 30),
+                    _readOnlyField('따르미', data['followerName'])
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    DateField(
+                      keyName: 'startDate',
+                      label: '시작일자',
+                      initialValue: data['startDate'],
+                      ref: ref,
+                    ),
+                    SizedBox(width: 30),
+                    DateField(
+                      keyName: 'endDate',
+                      label: '종료일자',
+                      initialValue: data['endDate'],
+                      ref: ref,
+                    )
+                  ],
+                ),
+                Text('진행상태', style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+                DropdownButton<String>(
+                  value: progressState,
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      ref.read(invitationStatusProvider.notifier).state = value;
+                    }
+                  },
+                  items: ['진행중', '종료', '중단']
+                      .map((status) => DropdownMenuItem(value: status, child: Text(status)))
+                      .toList(),
+                ),
+                SizedBox(height: 20),
+                _editableField(context, ref, 'meetingDate', '만남 일정', data['meetingDate']),
+                _editableField(context, ref, 'followerExpectation', '따르미에 대한 기대', data['followerExpectation']),
+                _editableField(context, ref, 'myExpectation', '이끄미에 대한 기대', data['myExpectation']),
+                _editableField(context, ref, 'followerChange', '따르미 변화', data['followerChange']),
+                _editableField(context, ref, 'myChange', '이끄미 변화', data['myChange']),
+                _editableField(context, ref, 'followerPray', '따르미 기도제목', data['followerPray']),
+                _editableField(context, ref, 'myPray', '이끄미 기도제목', data['myPray']),
+                _editableField(context, ref, 'feedback', '느낀점', data['feedback']),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    final updated = ref.read(invitationEditDataProvider);
+                    final progressMap = {'진행중': 0, '종료': 1, '중단': 2};
+                    final dataToSend = {
+                      ...updated,
+                      'invitationId': data['invitationId'],
+                      'progress': progressMap[progressState],
+                    };
 
-                const progressToInt = {'진행중': 0, '종료': 1, '중단': 2};
+                    ref.read(sendInvitationUpdateProvider((dataToSend, data['invitationId'])).future).then((_) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('저장되었습니다.'),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    }).catchError((e) {
+                      print(e);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('저장에 실패했습니다.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    });
+                  },
+                  child: Text('수정하기'),
+                ),
 
-                final formatted = {
-                  ...data,
-                  'progress': progressToInt[data['progress']] ?? 0, // 문자열을 숫자로 변환
-
-                  'startDate': _formatDate(data['startDate']),
-                  'endDate': _formatDate(data['endDate']),
-                  for (int i = 1; i <= 6;)
-                    '${_numToWord(i)}WeekDate': _formatDate(data['${_numToWord(i)}WeekDate']),
-                };
-
-                await ref.read(invitationRepositoryProvider).editInvitation(parsedId, formatted);
-                ref.refresh(invitationListProvider);
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('저장되었습니다')));
-              },
-              child: Text('저장'),
-            ),
-          ],
+              ],
+            );
+          },
+          loading: () => Center(child: CircularProgressIndicator()),
+          error: (e, st) => Center(child: Text('오류 발생: $e')),
         ),
       ),
+      )
     );
   }
 
-  Widget _dropdownProgress(WidgetRef ref) {
-    const progressMap = {'진행중': 0, '종료': 1, '중단': 2};
-    const reverseProgressMap = {0: '진행중', 1: '종료', 2: '중단'};
-
-    final rawValue = ref.watch(invitationEditDataProvider)['progress'] ?? '진행중';
-    final intValue = progressMap[rawValue] ?? 0;
-
-    return DropdownButtonFormField<int>(
-      value: intValue,
-      decoration: InputDecoration(labelText: '진행상황'),
-      items: progressMap.entries
-          .map((e) => DropdownMenuItem(value: e.value, child: Text(e.key)))
-          .toList(),
-      onChanged: (val) {
-        ref.read(invitationEditDataProvider.notifier).update(
-              (state) => {...state, 'progress': reverseProgressMap[val!]},
-        );
-      },
-    );
-  }
-
-
-  Widget _dateField(WidgetRef ref, String key, String label) {
-    final dateStr = ref.watch(invitationEditDataProvider)[key] ?? '';
-    final controller = TextEditingController(text: dateStr);
-
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(labelText: label),
-      onTap: () async {
-        FocusScope.of(ref.context).unfocus();
-        final selected = await showDatePicker(
-          context: ref.context,
-          initialDate: DateTime.tryParse(dateStr) ?? DateTime.now(),
-          firstDate: DateTime(2020),
-          lastDate: DateTime(2100),
-        );
-        if (selected != null) {
-          ref.read(invitationEditDataProvider.notifier).update((state) => {...state, key: selected.toIso8601String().split('T')[0]});
-        }
-      },
-    );
-  }
-
-  Widget _weekSection(WidgetRef ref, int week) {
-    final word = _numToWord(week);
-    final followerKey = '${word}WeekF';
-    final leaderKey = '${word}WeekL';
-    final dateKey = '${word}WeekDate';
-
+  Widget _readOnlyField(String label, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('[$week주차]', style: TextStyle(fontWeight: FontWeight.bold)),
-        TextField(
-          decoration: InputDecoration(labelText: '이끄미'),
-          controller: TextEditingController(text: ref.watch(invitationEditDataProvider)[leaderKey] ?? ''),
-          onChanged: (val) {
-            ref.read(invitationEditDataProvider.notifier).update((state) => {...state, leaderKey: val});
-          },
-        ),
-        TextField(
-          decoration: InputDecoration(labelText: '따르미'),
-          controller: TextEditingController(text: ref.watch(invitationEditDataProvider)[followerKey] ?? ''),
-          onChanged: (val) {
-            ref.read(invitationEditDataProvider.notifier).update((state) => {...state, followerKey: val});
-          },
-        ),
-        _dateField(ref, dateKey, '날짜'),
+        Text(label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+        Text(value, style: AppTypography.body1),
         SizedBox(height: 16),
       ],
     );
   }
 
-  String _numToWord(int num) {
-    const map = {
-      1: 'one',
-      2: 'two',
-      3: 'three',
-      4: 'four',
-      5: 'five',
-      6: 'six',
-    };
-    return map[num] ?? '';
-  }
+  Widget _editableField(BuildContext context, WidgetRef ref, String key, String label, String initialValue) {
+    final currentValue = ref.watch(invitationEditDataProvider)[key] ?? initialValue;
 
-  String _formatDate(String date) {
-    if (date.contains('T')) {
-      return date.split('T')[0];
-    }
-    return date;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+        SizedBox(height: 8),
+        TextFormField(
+          initialValue: currentValue,
+          onChanged: (value) {
+            ref.read(invitationEditControllerProvider.notifier).updateEditDataField(key, value);
+          },
+          minLines: 3,
+          maxLines: 3,
+          scrollPhysics: BouncingScrollPhysics(),
+          keyboardType: TextInputType.multiline,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: AppColors.grayScale_050,
+            border: OutlineInputBorder(borderRadius: AppBorderRadius.small8),
+          ),
+        ),
+        SizedBox(height: 16),
+      ],
+    );
   }
 }
 
+class DateField extends StatefulWidget {
+  final String keyName;
+  final String label;
+  final String initialValue;
+  final WidgetRef ref;
+
+  const DateField({
+    required this.keyName,
+    required this.label,
+    required this.initialValue,
+    required this.ref,
+    super.key,
+  });
+
+  @override
+  State<DateField> createState() => _DateFieldState();
+}
+
+class _DateFieldState extends State<DateField> {
+  late DateTime selectedDate;
+  late String displayText;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedDate = DateTime.tryParse(widget.initialValue) ?? DateTime.now();
+    displayText = DateFormat('yyyy년 M월 d일').format(selectedDate);
+  }
+
+  void _updateDate(DateTime newDate) {
+    setState(() {
+      selectedDate = newDate;
+      displayText = DateFormat('yyyy년 M월 d일').format(newDate);
+    });
+
+    final formatted = DateFormat('yyyy-MM-dd').format(newDate);
+    widget.ref.read(invitationEditControllerProvider.notifier).updateEditDataField(widget.keyName, formatted);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(widget.label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+        const SizedBox(height: 4),
+        InkWell(
+          onTap: () {
+            showCupertinoModalPopup(
+              context: context,
+              builder: (_) => Container(
+                height: 300,
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _updateDate(selectedDate);
+                        },
+                        child: Text('완료', style: TextStyle(color: AppColors.primary_450)),
+                      ),
+                    ),
+                    Expanded(
+                      child: CupertinoDatePicker(
+                        mode: CupertinoDatePickerMode.date,
+                        initialDateTime: selectedDate,
+                        onDateTimeChanged: (DateTime newDate) {
+                          selectedDate = newDate; // setState는 완료 버튼 누를 때만
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.grayScale_050,
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: AppBorderRadius.small8,
+            ),
+            child: Text(displayText, style: AppTypography.body1),
+          ),
+        ),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+}

@@ -17,24 +17,6 @@ class InvitationApi {
               'userId': res['userId'],
               'userName': res['userName'],
               'followerName': res['followerName'],
-              'oneWeekL': res['oneWeekL'] ?? '',
-              'oneWeekF': res['oneWeekF'] ?? '',
-              'oneWeekDate': res['oneWeekDate'] ?? '',
-              'twoWeekL': res['twoWeekL'] ?? '',
-              'twoWeekF': res['twoWeekF'] ?? '',
-              'twoWeekDate': res['twoWeekDate'] ?? '',
-              'threeWeekL': res['threeWeekL'] ?? '',
-              'threeWeekF': res['threeWeekF'] ?? '',
-              'threeWeekDate': res['threeWeekDate'] ?? '',
-              'fourWeekL': res['fourWeekL'] ?? '',
-              'fourWeekF': res['fourWeekF'] ?? '',
-              'fourWeekDate': res['fourWeekDate'] ?? '',
-              'fiveWeekL': res['fiveWeekL'] ?? '',
-              'fiveWeekF': res['fiveWeekF'] ?? '',
-              'fiveWeekDate': res['fiveWeekDate'] ?? '',
-              'sixWeekL': res['sixWeekL'] ?? '',
-              'sixWeekF': res['sixWeekF'] ?? '',
-              'sixWeekDate': res['sixWeekDate'] ?? '',
               'startDate': res['startDate'],
               'endDate': res['endDate'],
               'progress': res['progress'],
@@ -47,18 +29,75 @@ class InvitationApi {
     }
   }
 
-  Future<List<Map<String, dynamic>>> editInvitation(int invitationId, Map<String, dynamic> dto) async {
-    final res = await apiClient.request('PATCH', '/invitation/', dto);
-    final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
-
-    if (decodeRes is Map<String, dynamic> && decodeRes.containsKey('data')) {
-      return List<Map<String, dynamic>>.from(
-          (decodeRes['data'] as List).map((res) => {
-            'invitationId': res['invitationId'],
-          })
-      );
-    } else {
-      throw Exception(decodeRes);
+  Future<Map<String, dynamic>> getInvitationDetail(int invitationId) async {
+    try {
+      final res = await apiClient.request('GET', '/invitation/$invitationId', null);
+      final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
+      final data = decodeRes['data'];
+      return {
+        'invitationId': data['invitationId'],
+        'userId': data['userId'],
+        'userName': data['userName'],
+        'followerName': data['followerName'],
+        'startDate': data['startDate'],
+        'endDate': data['endDate'] ?? '',
+        'meetingDate': data['meetingDate'] ?? '',
+        'followerExpectation': data['followerExpectation'] ?? '',
+        'myExpectation': data['myExpectation'] ?? '',
+        'followerChange': data['followerChange'] ?? '',
+        'myChange': data['myChange'] ?? '',
+        'followerPray': data['followerPray'] ?? '',
+        'myPray': data['myPray'] ?? '',
+        'feedback': data['feedback'] ?? '',
+        'progress': data['progress'],
+        'createdAt': data['createdAt'],
+        'modifiedAt': data['modifiedAt']
+      };
+    } catch(e) {
+      throw Exception(e);
     }
   }
+
+  Future<Map<String, dynamic>> editInvitation(int invitationId, Map<String, dynamic> dto) async {
+    try {
+      final res = await apiClient.request('PATCH', '/invitation/$invitationId', dto);
+      final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
+      final data = decodeRes['data'];
+      return {
+        'invitationId': data['invitationId'],
+        'userId': data['userId'],
+        'userName': data['userName'],
+        'followerName': data['followerName'],
+        'startDate': data['startDate'],
+        'endDate': data['endDate'] ?? '',
+        'progress': data['progress'],
+        'createdAt': data['createdAt'],
+        'modifiedAt': data['modifiedAt']
+      };
+    } catch(e) {
+      throw Exception(e);
+    }
+  }
+
+  Future<Map<String, dynamic>> deleteInvitation(int invitationId) async {
+    try {
+      final res = await apiClient.request('DELETE', '/invitation/$invitationId', null);
+      final decodeRes = jsonDecode(utf8.decode(res.bodyBytes));
+      final data = decodeRes['data'];
+      return {
+        'invitationId': data['invitationId'],
+        'userId': data['userId'],
+        'userName': data['userName'],
+        'followerName': data['followerName'],
+        'startDate': data['startDate'],
+        'endDate': data['endDate'] ?? '',
+        'progress': data['progress'],
+        'createdAt': data['createdAt'],
+        'modifiedAt': data['modifiedAt']
+      };
+    } catch(e) {
+      throw Exception(e);
+    }
+  }
+
 }

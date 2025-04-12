@@ -13,7 +13,6 @@ final invitationListProvider = FutureProvider.autoDispose((ref) async {
   final repository = ref.read(invitationRepositoryProvider);
 
   final authState = ref.watch(authProvider);
-  final role = authState['role'];
 
   return await repository.showInvitationList();
 });
@@ -25,6 +24,23 @@ final invitationEditDataProvider = StateProvider<Map<String, dynamic>>((ref) => 
 final invitationEditControllerProvider =
 StateNotifierProvider<InvitationEditController, Map<int, TextEditingController?>>((ref) {
   return InvitationEditController(ref);
+});
+
+final invitationDetailProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, int>((ref, int id) async {
+  final repo = ref.read(invitationRepositoryProvider);
+  return await repo.getInvitationDetail(id);
+});
+
+final sendInvitationUpdateProvider = FutureProvider.family<void, (Map<String, dynamic>, int)>((ref, tuple) async {
+  final repo = ref.read(invitationRepositoryProvider);
+  final data = tuple.$1;
+  final id = tuple.$2;
+  await repo.updateInvitation(id, data);
+});
+
+final deleteInvitationProvider = Provider.family<void, int>((ref, id) {
+  final repo = ref.read(invitationRepositoryProvider);
+  repo.deleteInvitation(id);
 });
 
 class InvitationEditController extends StateNotifier<Map<int, TextEditingController?>> {

@@ -27,11 +27,10 @@ class InvitationPage extends ConsumerWidget {
                       final invitation = res[index];
                       return GestureDetector(
                         onTap: () {
-                          Navigator.push(
+                          Navigator.pushNamed(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => InvitationDetailPage(invitationId: invitation['invitationId'].toString()),
-                            ),
+                            '/invitationDetail',
+                            arguments: invitation['invitationId'],
                           );
                         },
                         child: Card(
