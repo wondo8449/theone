@@ -43,6 +43,23 @@ class AuthApi {
     }
   }
 
+  Future<void> changePassword(String nowPw, String newPw) async {
+    final responseRaw = await apiClient.request(
+      'PATCH',
+      '/user/changePassword',
+      {'nowPassword': nowPw, 'newPassword': newPw},
+    );
+
+    if (responseRaw.statusCode != 200) {
+      try {
+        final decoded = jsonDecode(utf8.decode(responseRaw.bodyBytes));
+        final message = decoded['message'] ?? '비밀번호 변경 실패';
+        throw Exception(message);
+      } catch (_) {
+        throw Exception('비밀번호 변경 실패');
+      }
+    }
+  }
 }
 
 final authApiProvider = Provider<AuthApi>((ref) {

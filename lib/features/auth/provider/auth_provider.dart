@@ -42,8 +42,19 @@ class AuthNotifier extends StateNotifier<Map<String, String?>> {
     await storage.delete(key: 'accessToken');
     state = {'token': "", 'role': "", 'loginId': "", 'isAccepted': ""};
   }
+
+  Future<void> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    // TODO: 실제 API 요청 보내는 로직 작성 (예: Dio 등)
+    // 임시 예시
+    print('비밀번호 변경 요청: 현재=$currentPassword, 새비밀번호=$newPassword');
+    await Future.delayed(const Duration(seconds: 1));
+  }
 }
 
 final authProvider = StateNotifierProvider<AuthNotifier, Map<String, String?>>((ref) {
   return AuthNotifier();
 });
+
