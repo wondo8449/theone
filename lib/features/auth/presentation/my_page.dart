@@ -102,7 +102,6 @@ class _MyPageState extends ConsumerState<MyPage> {
         child: ListView(
           children: [
             Text('이름 : $loginId', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Text('권한 : $role', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             const Divider(height: 40),
             Text('비밀번호 변경', style: AppTypography.headline5),
@@ -130,16 +129,13 @@ class _MyPageState extends ConsumerState<MyPage> {
               child: const Text('비밀번호 변경하기'),
             ),
             const Divider(height: 40),
-            Padding(
-              padding: AppSpacing.medium16,
-              child: ElevatedButton(
+            ElevatedButton(
                 onPressed: () async {
                   await ref.read(authProvider.notifier).logout();
                   Navigator.pushReplacementNamed(context, '/login');
                 },
                 child: const Text('로그아웃'),
               ),
-            ),
           ],
         ),
       ),

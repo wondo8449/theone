@@ -40,42 +40,46 @@ class TreePage extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 8),
-                  child: DropdownButton<String>(
-                    value: selectedYearMonth,
-                    style: AppTypography.buttonLabelXSmall.copyWith(color: AppColors.grayScale_850),
-                    items: ['202502', '202503', '202504', '202505', '202506']
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        ref.read(yearMonthProvider.notifier).state = newValue;
-                      }
-                    },
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 8),
+                      child: DropdownButton<String>(
+                        value: selectedYearMonth,
+                        style: AppTypography.buttonLabelXSmall.copyWith(color: AppColors.grayScale_850),
+                        items: ['202502', '202503', '202504', '202505', '202506']
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (newValue) {
+                          if (newValue != null) {
+                            ref.read(yearMonthProvider.notifier).state = newValue;
+                          }
+                        },
+                      ),
+                    ),
                   ),
-                ),
+                  if(role == "ADMIN" || role == "DIRECTOR")
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: DropdownButton<String>(
+                        value: selectedSearchValue,
+                        style: AppTypography.buttonLabelXSmall.copyWith(color: AppColors.grayScale_850),
+                        items: ['고요나무', '박예나무', '소윤나무', '수현나무', '승현나무', '시야나무', '예찬나무', '오예나무', '유요나무', '이현나무', '지현나무', '지훈나무']
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (newValue) {
+                          if (newValue != null) {
+                            ref.read(searchValueProvider.notifier).state = newValue;
+                          }
+                        },
+                      ),
+                    ),
+                ],
               ),
-              if(role == "ADMIN" || role == "DIRECTOR")
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: DropdownButton<String>(
-                    value: selectedSearchValue,
-                    style: AppTypography.buttonLabelXSmall.copyWith(color: AppColors.grayScale_850),
-                    items: ['고요나무', '박예나무', '소윤나무', '수현나무', '승현나무', '시야나무', '예찬나무', '오예나무', '유요나무', '이현나무', '지현나무', '지훈나무']
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (newValue) {
-                      if (newValue != null) {
-                        ref.read(searchValueProvider.notifier).state = newValue;
-                      }
-                    },
-                  ),
-                ),
               SizedBox(height: 8),
-
               Expanded(
                 child: treeComments.when(
                   data: (comments) {
