@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ApiClient {
-  final String baseUrl = 'http://14.5.86.192/api';
+  final String baseUrl = 'https://theone.onl/api';
   final storage = const FlutterSecureStorage();
 
   // 저장된 JWT 토큰 가져오기
