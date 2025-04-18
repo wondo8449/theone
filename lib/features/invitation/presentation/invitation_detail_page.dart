@@ -15,7 +15,69 @@ class InvitationDetailPage extends ConsumerStatefulWidget {
 }
 
 class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
-  bool _isInitialized = false;
+  final Map<String, TextEditingController> _controllers = {};
+  bool isInitialized = false;
+
+  final List<String> fields = [
+    'meetingDate',
+    'followerExpectation',
+    'myExpectation',
+    'followerPray',
+    'myPray',
+    'followerChange',
+    'myChange',
+    'feedback',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    for (var field in fields) {
+      _controllers[field] = TextEditingController();
+    }
+
+    Future.microtask(() {
+      final id = ModalRoute.of(context)!.settings.arguments as int;
+      ref.listenManual(
+        invitationDetailProvider(id),
+            (previous, next) {
+          next.whenData((invitationData) {
+            if (!isInitialized) {
+              for (var field in fields) {
+                _controllers[field]?.text = invitationData[field] ?? '';
+                // Edit 데이터도 함께 초기화
+                ref.read(invitationEditControllerProvider.notifier)
+                    .updateEditDataField(field, invitationData[field] ?? '');
+              }
+
+              // 날짜 필드도 초기화
+              ref.read(invitationEditControllerProvider.notifier)
+                  .updateEditDataField('startDate', invitationData['startDate'] ?? '');
+              ref.read(invitationEditControllerProvider.notifier)
+                  .updateEditDataField('endDate', invitationData['endDate'] ?? '');
+
+              // 진행 상태도 초기화
+              final progressMap = {0: '진행중', 1: '종료', 2: '중단'};
+              final progress = invitationData['progress'];
+              if (progressMap.containsKey(progress)) {
+                ref.read(invitationStatusProvider.notifier).state = progressMap[progress]!;
+              }
+
+              isInitialized = true;
+            }
+          });
+        },
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,16 +122,6 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
         padding: AppSpacing.medium16,
         child: invitationDetail.when(
           data: (data) {
-            // 딱 한 번만 초기화
-            if (!_isInitialized) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                ref.read(invitationEditControllerProvider.notifier).initializeEditData(data);
-              });
-              _isInitialized = true;
-            }
-
-            final editController = ref.watch(invitationEditControllerProvider);
-
             return ListView(
               children: [
                 Row(
@@ -264,14 +316,15 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
       String when,
       String initialValue,
       ) {
-    final controllerMap = ref.watch(invitationEditControllerProvider);
-    final controller = controllerMap[key.hashCode] ??
-        TextEditingController(text: initialValue);
+    final controller = _controllers[key]!;
 
-    controller.addListener(() {
-      ref.read(invitationEditControllerProvider.notifier)
-          .updateEditDataField(key, controller.text);
-    });
+    // ⚠️ addListener 중복 방지: isInitialized 조건 체크
+    if (isInitialized && !controller.hasListeners) {
+      controller.addListener(() {
+        ref.read(invitationEditControllerProvider.notifier)
+            .updateEditDataField(key, controller.text);
+      });
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
