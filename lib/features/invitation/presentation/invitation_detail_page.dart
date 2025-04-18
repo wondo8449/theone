@@ -111,14 +111,14 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
                       .toList(),
                 ),
                 SizedBox(height: 20),
-                _editableField(context, ref, 'meetingDate', '만남 일정', data['meetingDate']),
-                _editableField(context, ref, 'followerExpectation', '따르미에 대한 기대', data['followerExpectation']),
-                _editableField(context, ref, 'myExpectation', '이끄미에 대한 기대', data['myExpectation']),
-                _editableField(context, ref, 'followerChange', '따르미 변화', data['followerChange']),
-                _editableField(context, ref, 'myChange', '이끄미 변화', data['myChange']),
-                _editableField(context, ref, 'followerPray', '따르미 기도제목', data['followerPray']),
-                _editableField(context, ref, 'myPray', '이끄미 기도제목', data['myPray']),
-                _editableField(context, ref, 'feedback', '느낀점', data['feedback']),
+                _editableField(context, ref, 'meetingDate', '만남 일정', '매주 만나는 요일과 시간', '시작 시 작성', data['meetingDate']),
+                _editableField(context, ref, 'followerExpectation', '따르미에 대한 기대', '풍삶초를 시작하며 따르미가 어떤 기대나 소망을 가지고 시작하는지', '시작 시 작성', data['followerExpectation']),
+                _editableField(context, ref, 'myExpectation', '이끄미로서의 기대', '풍삶초를 시작하며 이끄미로써 어떤 기대나 소망을 가지고 시작하는지', '시작 시 작성', data['myExpectation']),
+                _editableField(context, ref, 'followerPray', '따르미 기도제목', '따르미의 기도제목', '시작 시 작성', data['followerPray']),
+                _editableField(context, ref, 'myPray', '이끄미 기도제목', '이끄미의 기도제목', '시작 시 작성', data['myPray']),
+                _editableField(context, ref, 'followerChange', '따르미의 변화 과정', '풍삶초를 통한 따르미의 변화된 점, 새롭게 알게 된 내용이나 중요하게 생각하게 된 부분, 결심하게 된 부분', '4~5주차 작성', data['followerChange']),
+                _editableField(context, ref, 'myChange', '이끄미의 변화 과정', '중요하게 생각하게 된 내용, 따르미의 대화를 통하여 도전받은 부분,  결심하게 된 부분 ', '4~5주차 작성', data['myChange']),
+                _editableField(context, ref, 'feedback', '풍삶초를 돌아보며', '1) 따르미의 성장 관찰 \n2) 이끄미로서 배우고 느낀 점 \n3) 풍삶초를 마무리하며 나누고 싶은 점', '종료 시 작성 (가장 중요)', data['feedback']),
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
@@ -255,13 +255,22 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
     );
   }
 
-  Widget _editableField(BuildContext context, WidgetRef ref, String key, String label, String initialValue) {
+  Widget _editableField(BuildContext context, WidgetRef ref, String key, String label, String description, String when, String initialValue) {
     final currentValue = ref.watch(invitationEditDataProvider)[key] ?? initialValue;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+            SizedBox(width: 8),
+            Text(when, style: AppTypography.body2.copyWith(color: AppColors.grayScale_450))
+          ],
+        ),
+        SizedBox(height: 8),
+        Text(description, style: AppTypography.body2.copyWith(color: AppColors.grayScale_450)),
         SizedBox(height: 8),
         TextFormField(
           initialValue: currentValue,
