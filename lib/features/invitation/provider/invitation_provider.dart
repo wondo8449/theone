@@ -39,9 +39,9 @@ final invitationEditProvider = StateProvider<int?>((ref) => null);
 final invitationEditDataProvider = StateProvider<Map<String, dynamic>>((ref) => {});
 
 final invitationEditControllerProvider =
-StateNotifierProvider<InvitationEditController, Map<int, TextEditingController?>>((ref) {
-  return InvitationEditController(ref);
-});
+StateNotifierProvider<InvitationEditController, Map<String, TextEditingController>>(
+      (ref) => InvitationEditController(ref),
+);
 
 final invitationDetailProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, int>((ref, int id) async {
   final repo = ref.read(invitationRepositoryProvider);
@@ -60,17 +60,17 @@ final deleteInvitationProvider = FutureProvider.autoDispose.family<void, int>((r
   await repo.deleteInvitation(id);
 });
 
-class InvitationEditController extends StateNotifier<Map<int, TextEditingController?>> {
+class InvitationEditController extends StateNotifier<Map<String, TextEditingController>> {
   final Ref ref;
 
   InvitationEditController(this.ref) : super({});
 
-  void startEditing(int week, String initialValue) {
+  void startEditing(String key, String initialValue) {
     state = {
       ...state,
-      week: TextEditingController(text: initialValue),
+      key: TextEditingController(text: initialValue),
     };
-    ref.read(invitationEditProvider.notifier).state = week;
+    ref.read(invitationEditProvider.notifier).state = int.tryParse(key); // 혹은 따로 처리
   }
 
   void stopEditing() {
@@ -90,5 +90,7 @@ class InvitationEditController extends StateNotifier<Map<int, TextEditingControl
     ref.read(invitationEditDataProvider.notifier).state = Map.from(invitation);
   }
 }
+
+
 
 

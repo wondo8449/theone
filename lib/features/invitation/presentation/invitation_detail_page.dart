@@ -255,8 +255,23 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
     );
   }
 
-  Widget _editableField(BuildContext context, WidgetRef ref, String key, String label, String description, String when, String initialValue) {
-    final currentValue = ref.watch(invitationEditDataProvider)[key] ?? initialValue;
+  Widget _editableField(
+      BuildContext context,
+      WidgetRef ref,
+      String key,
+      String label,
+      String description,
+      String when,
+      String initialValue,
+      ) {
+    final controllerMap = ref.watch(invitationEditControllerProvider);
+    final controller = controllerMap[key.hashCode] ??
+        TextEditingController(text: initialValue);
+
+    controller.addListener(() {
+      ref.read(invitationEditControllerProvider.notifier)
+          .updateEditDataField(key, controller.text);
+    });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,10 +288,7 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
         Text(description, style: AppTypography.body2.copyWith(color: AppColors.grayScale_450)),
         SizedBox(height: 8),
         TextFormField(
-          initialValue: currentValue,
-          onChanged: (value) {
-            ref.read(invitationEditControllerProvider.notifier).updateEditDataField(key, value);
-          },
+          controller: controller,
           minLines: 3,
           maxLines: 3,
           scrollPhysics: BouncingScrollPhysics(),
@@ -291,6 +303,7 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
       ],
     );
   }
+
 }
 
 class DateField extends StatefulWidget {
