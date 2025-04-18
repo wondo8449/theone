@@ -7,50 +7,84 @@ import 'package:theone/core/constants/app_typography.dart';
 import 'package:theone/features/sharing/provider/sharing_provider.dart';
 import '../../../core/constants/app_border_radius.dart';
 
-class SharingPage extends ConsumerWidget {
+class SharingPage extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _SharingPageState createState() => _SharingPageState();
+}
+
+class _SharingPageState extends ConsumerState<SharingPage> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(QTSharingProvider.notifier).refresh();
+    ref.read(invitationSharingProvider.notifier).refresh();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      ref.read(QTSharingProvider.notifier).refresh();
+      ref.read(invitationSharingProvider.notifier).refresh();
+    }
+  }
+
+  String formatDate(String timestamp) {
+    DateTime date = DateTime.parse(timestamp);
+    return DateFormat('yyyy년 M월 d일').format(date);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final QTSharingList = ref.watch(QTSharingProvider);
     final invitationSharingList = ref.watch(invitationSharingProvider);
-
-    String formatDate(String timestamp) {
-      DateTime date = DateTime.parse(timestamp);
-      return DateFormat('yyyy년 M월 d일').format(date);
-    }
 
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () async {
-      await ref.read(QTSharingProvider.notifier).refresh();
-      await ref.read(invitationSharingProvider.notifier).refresh();
-      },
-      child: Padding(
+          await ref.read(QTSharingProvider.notifier).refresh();
+          await ref.read(invitationSharingProvider.notifier).refresh();
+        },
+        child: Padding(
           padding: AppSpacing.medium16,
           child: ListView(
             children: [
               Row(
                 children: [
                   TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/QTwrite');
-                      },
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
-                        minimumSize: WidgetStateProperty.all<Size>(Size(100, 35)),
-                        shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
-                        )),
-                      child: Text('+ QT 나눔 쓰기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.primary_450))),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/QTwrite');
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
+                      minimumSize: WidgetStateProperty.all<Size>(Size(100, 35)),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
+                      ),
+                    ),
+                    child: Text('+ QT 나눔 쓰기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.primary_450)),
+                  ),
                   SizedBox(width: 16),
                   TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/invitationWrite');
-                      },
-                      style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
-                          minimumSize: WidgetStateProperty.all<Size>(Size(100, 35)),
-                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
-                          )),
-                      child: Text('+ 풍삶초 나눔 쓰기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.primary_450))),
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/invitationWrite');
+                    },
+                    style: ButtonStyle(
+                      backgroundColor: WidgetStateProperty.all<Color>(AppColors.primary_150),
+                      minimumSize: WidgetStateProperty.all<Size>(Size(100, 35)),
+                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                        RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
+                      ),
+                    ),
+                    child: Text('+ 풍삶초 나눔 쓰기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.primary_450)),
+                  ),
                 ],
               ),
               SizedBox(height: 12),
@@ -59,17 +93,20 @@ class SharingPage extends ConsumerWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                     Text('QT 나눔', style: AppTypography.headline4),
-                     TextButton(
-                         onPressed: () {
-                           Navigator.pushNamed(context, '/QTSharingList');
-                         },
-                         style: ButtonStyle(
-                             minimumSize: WidgetStateProperty.all<Size>(Size(30, 20)),
-                             shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
-                             )),
-                         child: Text('+ 더보기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.grayScale_850))),
-                   ],
+                      Text('QT 나눔', style: AppTypography.headline4),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/QTSharingList');
+                        },
+                        style: ButtonStyle(
+                          minimumSize: WidgetStateProperty.all<Size>(Size(30, 20)),
+                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
+                          ),
+                        ),
+                        child: Text('+ 더보기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.grayScale_850)),
+                      ),
+                    ],
                   ),
                   QTSharingList.when(
                     data: (QTsharings) {
@@ -113,8 +150,8 @@ class SharingPage extends ConsumerWidget {
                     },
                     loading: () => Center(child: CircularProgressIndicator()),
                     error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
-                  )
-                ]
+                  ),
+                ],
               ),
               SizedBox(height: 16),
               Column(
@@ -124,14 +161,17 @@ class SharingPage extends ConsumerWidget {
                     children: [
                       Text('풍삶초 나눔', style: AppTypography.headline4),
                       TextButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/invitationSharingList');
-                          },
-                          style: ButtonStyle(
-                              minimumSize: WidgetStateProperty.all<Size>(Size(30, 20)),
-                              shape: WidgetStateProperty.all<RoundedRectangleBorder>(RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
-                              )),
-                          child: Text('+ 더보기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.grayScale_850))),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/invitationSharingList');
+                        },
+                        style: ButtonStyle(
+                          minimumSize: WidgetStateProperty.all<Size>(Size(30, 20)),
+                          shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(borderRadius: AppBorderRadius.medium16),
+                          ),
+                        ),
+                        child: Text('+ 더보기', style: AppTypography.buttonLabelSmall.copyWith(color: AppColors.grayScale_850)),
+                      ),
                     ],
                   ),
                   invitationSharingList.when(
@@ -176,13 +216,13 @@ class SharingPage extends ConsumerWidget {
                     },
                     loading: () => Center(child: CircularProgressIndicator()),
                     error: (error, stack) => Center(child: Text('데이터 로드 실패: $error')),
-                  )
+                  ),
                 ],
-              )
+              ),
             ],
           ),
-      )
-      )
+        ),
+      ),
     );
   }
 }
