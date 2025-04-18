@@ -7,21 +7,43 @@ import '../../auth/provider/auth_provider.dart';
 import '../provider/sharing_provider.dart';
 import 'package:flutter/cupertino.dart';
 
-class QTSharingDetailPage extends ConsumerWidget {
+class QTSharingDetailPage extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _QTSharingDetailPageState createState() => _QTSharingDetailPageState();
+}
+
+class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
+  late TextEditingController titleController;
+  late TextEditingController contentController;
+  bool isInitialized = false;
+  Map<String, dynamic>? cachedData;
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    contentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    ref.invalidate(sharingDetailProvider);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final int id = ModalRoute.of(context)!.settings.arguments as int;
     final authState = ref.watch(authProvider);
     final loginId = authState['loginId'];
+    final QTDetail = ref.watch(sharingDetailProvider(id));
 
     String formatDate(String timestamp) {
       DateTime date = DateTime.parse(timestamp);
       return DateFormat('yyyy년 M월 d일').format(date);
     }
-
-    final QTDetail = ref.watch(sharingDetailProvider(id));
-    final titleController = ref.watch(titleControllerProvider);
-    final contentController = ref.watch(contentControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -63,20 +85,37 @@ class QTSharingDetailPage extends ConsumerWidget {
             data: (data) {
               final QTData = data as Map<String, dynamic>;
 
-              titleController.text = QTData['title'] ?? '';
-              contentController.text = QTData['content'] ?? '';
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!isInitialized || titleController.text != QTData['title'] || contentController.text != QTData['content']) {
+                  titleController.text = QTData['title'] ?? '';
+                  contentController.text = QTData['content'] ?? '';
+                  isInitialized = true;
+                }
+              });
 
               return ListView(
                 children: [
                   Text('제목', style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      hintText: '제목을 입력해주세요.',
-                      enabledBorder: UnderlineInputBorder(borderRadius: BorderRadius.all(Radius.zero)),
-                      disabledBorder: InputBorder.none,
+                  if (loginId == QTData['userName'])
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        hintText: '제목을 입력해주세요.',
+                        enabledBorder: UnderlineInputBorder(borderRadius: BorderRadius.all(Radius.zero)),
+                        disabledBorder: InputBorder.none,
+                      ),
                     ),
-                  ),
+                  if (loginId != QTData['userName'])
+                    TextField(
+                      controller: titleController,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        hintText: '제목을 입력해주세요.',
+                        enabledBorder: UnderlineInputBorder(borderRadius: BorderRadius.all(Radius.zero)),
+                        border: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
+                    ),
                   SizedBox(height: 16),
                   Text('내용', style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
                   SizedBox(height: 16),
@@ -134,6 +173,7 @@ class QTSharingDetailPage extends ConsumerWidget {
                         final data = {'title': title, 'content': content};
 
                         ref.read(modifySharingDataProvider((id, data)).future).then((_) {
+                          ref.invalidate(sharingDetailProvider);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('수정이 완료되었습니다.'),

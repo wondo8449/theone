@@ -4,13 +4,33 @@ import 'package:theone/core/constants/app_colors.dart';
 import 'package:theone/core/constants/app_typography.dart';
 import '../provider/sharing_provider.dart';
 
-class InvitationWritePage extends ConsumerWidget {
+class InvitationWritePage extends ConsumerStatefulWidget {
+  @override
+  _InvitationWritePageState createState() => _InvitationWritePageState();
+}
+
+
+class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
+  late TextEditingController titleController;
+  late TextEditingController contentController;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final titleController = ref.watch(titleControllerProvider);
-    final contentController = ref.watch(contentControllerProvider);
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    contentController = TextEditingController();
+  }
 
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    ref.read(sharingFormProvider.notifier).reset();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('풍삶초 나눔 작성', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true, automaticallyImplyLeading:true),
       body: GestureDetector(

@@ -4,13 +4,32 @@ import 'package:theone/core/constants/app_colors.dart';
 import 'package:theone/core/constants/app_typography.dart';
 import '../provider/sharing_provider.dart';
 
-class QTWritePage extends ConsumerWidget {
+class QTWritePage extends ConsumerStatefulWidget {
+  @override
+  _QTWritePageState createState() => _QTWritePageState();
+}
+
+class _QTWritePageState extends ConsumerState<QTWritePage> {
+  late TextEditingController titleController;
+  late TextEditingController contentController;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final titleController = ref.watch(titleControllerProvider);
-    final contentController = ref.watch(contentControllerProvider);
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    contentController = TextEditingController();
+  }
 
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    ref.read(sharingFormProvider.notifier).reset();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('QT 나눔 작성', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true, automaticallyImplyLeading:true),
       body: GestureDetector(

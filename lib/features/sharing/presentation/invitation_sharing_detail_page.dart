@@ -7,21 +7,43 @@ import '../../../core/constants/app_typography.dart';
 import '../../auth/provider/auth_provider.dart';
 import '../provider/sharing_provider.dart';
 
-class InvitationSharingDetailPage extends ConsumerWidget {
+class InvitationSharingDetailPage extends ConsumerStatefulWidget {
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _InvitationSharingDetailPageState createState() => _InvitationSharingDetailPageState();
+}
+
+class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingDetailPage> {
+  late TextEditingController titleController;
+  late TextEditingController contentController;
+  bool isInitialized = false;
+  Map<String, dynamic>? cachedData;
+
+  @override
+  void initState() {
+    super.initState();
+    titleController = TextEditingController();
+    contentController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    ref.invalidate(sharingDetailProvider);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final int id = ModalRoute.of(context)!.settings.arguments as int;
     final authState = ref.watch(authProvider);
     final loginId = authState['loginId'];
+    final invitationDetail = ref.watch(sharingDetailProvider(id));
 
     String formatDate(String timestamp) {
       DateTime date = DateTime.parse(timestamp);
       return DateFormat('yyyy년 M월 d일').format(date);
     }
-
-    final invitationDetail = ref.watch(sharingDetailProvider(id));
-    final titleController = ref.watch(titleControllerProvider);
-    final contentController = ref.watch(contentControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -58,24 +80,43 @@ class InvitationSharingDetailPage extends ConsumerWidget {
             data: (data) {
               final invitationData = data as Map<String, dynamic>;
 
-              titleController.text = invitationData['title'] ?? '';
-              contentController.text = invitationData['content'] ?? '';
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (!isInitialized || titleController.text != invitationData['title'] || contentController.text != invitationData['content']) {
+                  titleController.text = invitationData['title'] ?? '';
+                  contentController.text = invitationData['content'] ?? '';
+                  isInitialized = true;
+                }
+              });
 
               return ListView(
                 children: [
                   Text('제목',
                       style: AppTypography.headline5
                           .copyWith(color: AppColors.primary_450)),
-                  TextField(
-                    controller: titleController,
-                    decoration: InputDecoration(
-                      hintText: '제목을 입력해주세요.',
-                      enabledBorder: UnderlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.zero),
+                  if (loginId == invitationData['userName'])
+                    TextField(
+                      controller: titleController,
+                      decoration: InputDecoration(
+                        hintText: '제목을 입력해주세요.',
+                        enabledBorder: UnderlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.zero),
+                        ),
+                        disabledBorder: InputBorder.none,
                       ),
-                      disabledBorder: InputBorder.none,
                     ),
-                  ),
+                  if (loginId != invitationData['userName'])
+                    TextField(
+                      controller: titleController,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        hintText: '제목을 입력해주세요.',
+                        enabledBorder: UnderlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.zero),
+                        ),
+                        border: InputBorder.none,
+                        disabledBorder: InputBorder.none,
+                      ),
+                    ),
                   SizedBox(height: 16),
                   Text('내용',
                       style: AppTypography.headline5
@@ -146,6 +187,7 @@ class InvitationSharingDetailPage extends ConsumerWidget {
                         final data = {'title': title, 'content': content};
 
                         ref.read(modifySharingDataProvider((id, data)).future).then((_) {
+                          ref.invalidate(sharingDetailProvider);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('수정이 완료되었습니다.'),
