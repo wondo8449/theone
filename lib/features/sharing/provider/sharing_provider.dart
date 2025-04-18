@@ -7,51 +7,6 @@ import 'package:theone/features/sharing/data/sharing_repository.dart';
 final sharingApiProvider = Provider((ref) => SharingApi(ref.read(apiClientProvider)));
 final sharingRepositoryProvider = Provider((ref) => SharingRepository(ref.read(sharingApiProvider)));
 
-final sharingFormProvider = StateNotifierProvider.autoDispose<SharingFormNotifier, SharingFormState>((ref) {
-  return SharingFormNotifier();
-});
-
-class SharingFormState {
-  final String title;
-  final String content;
-
-  SharingFormState({
-    this.title = '',
-    this.content = '',
-  });
-
-  SharingFormState copyWith({
-    String? title,
-    String? content,
-  }) {
-    return SharingFormState(
-      title: title ?? this.title,
-      content: content ?? this.content,
-    );
-  }
-}
-
-class SharingFormNotifier extends StateNotifier<SharingFormState> {
-  SharingFormNotifier() : super(SharingFormState());
-
-  void setTitle(String title) {
-    state = state.copyWith(title: title);
-  }
-
-  void setContent(String content) {
-    state = state.copyWith(content: content);
-  }
-
-  void setInitialData(String title, String content) {
-    state = SharingFormState(title: title, content: content);
-  }
-
-  void reset() {
-    state = SharingFormState();
-  }
-}
-
-
 final sendSharingDataProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, Map<String, dynamic>>((ref, data) async {
   final repository = ref.read(sharingRepositoryProvider);
   return await repository.createSharing(data);

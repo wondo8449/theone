@@ -16,7 +16,6 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
   late TextEditingController titleController;
   late TextEditingController contentController;
   bool isInitialized = false;
-  Map<String, dynamic>? cachedData;
 
   @override
   void initState() {
@@ -29,7 +28,6 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
   void dispose() {
     titleController.dispose();
     contentController.dispose();
-    ref.invalidate(sharingDetailProvider);
     super.dispose();
   }
 
@@ -80,13 +78,11 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
             data: (data) {
               final invitationData = data as Map<String, dynamic>;
 
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!isInitialized || titleController.text != invitationData['title'] || contentController.text != invitationData['content']) {
-                  titleController.text = invitationData['title'] ?? '';
-                  contentController.text = invitationData['content'] ?? '';
-                  isInitialized = true;
-                }
-              });
+              if (!isInitialized) {
+                titleController.text = invitationData['title'] ?? '';
+                contentController.text = invitationData['content'] ?? '';
+                isInitialized = true;
+              }
 
               return ListView(
                 children: [
@@ -187,7 +183,6 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
                         final data = {'title': title, 'content': content};
 
                         ref.read(modifySharingDataProvider((id, data)).future).then((_) {
-                          ref.invalidate(sharingDetailProvider);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('수정이 완료되었습니다.'),

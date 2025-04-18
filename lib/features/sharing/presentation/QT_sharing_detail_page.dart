@@ -16,7 +16,6 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
   late TextEditingController titleController;
   late TextEditingController contentController;
   bool isInitialized = false;
-  Map<String, dynamic>? cachedData;
 
   @override
   void initState() {
@@ -29,7 +28,6 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
   void dispose() {
     titleController.dispose();
     contentController.dispose();
-    ref.invalidate(sharingDetailProvider);
     super.dispose();
   }
 
@@ -85,13 +83,11 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
             data: (data) {
               final QTData = data as Map<String, dynamic>;
 
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                if (!isInitialized || titleController.text != QTData['title'] || contentController.text != QTData['content']) {
-                  titleController.text = QTData['title'] ?? '';
-                  contentController.text = QTData['content'] ?? '';
-                  isInitialized = true;
-                }
-              });
+              if (!isInitialized) {
+                titleController.text = QTData['title'] ?? '';
+                contentController.text = QTData['content'] ?? '';
+                isInitialized = true;
+              }
 
               return ListView(
                 children: [
@@ -173,7 +169,6 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
                         final data = {'title': title, 'content': content};
 
                         ref.read(modifySharingDataProvider((id, data)).future).then((_) {
-                          ref.invalidate(sharingDetailProvider);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('수정이 완료되었습니다.'),

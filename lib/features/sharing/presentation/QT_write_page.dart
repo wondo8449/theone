@@ -24,7 +24,6 @@ class _QTWritePageState extends ConsumerState<QTWritePage> {
   void dispose() {
     titleController.dispose();
     contentController.dispose();
-    ref.read(sharingFormProvider.notifier).reset();
     super.dispose();
   }
 

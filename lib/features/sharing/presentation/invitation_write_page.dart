@@ -25,7 +25,6 @@ class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
   void dispose() {
     titleController.dispose();
     contentController.dispose();
-    ref.read(sharingFormProvider.notifier).reset();
     super.dispose();
   }
 
