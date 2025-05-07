@@ -137,7 +137,7 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
                         disabledBorder: InputBorder.none,
                         contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
                       ),
-                      maxLines: 15,
+                      maxLines: null,
                       minLines: 15,
                       style: AppTypography.body1.copyWith(color: AppColors.grayScale_750),
                     ),

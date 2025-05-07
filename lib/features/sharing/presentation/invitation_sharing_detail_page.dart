@@ -143,13 +143,11 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
                         hintText: '내용을 입력해주세요.',
                         border: InputBorder.none,
                         disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 12.0),
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
                       ),
-                      maxLines: 15,
+                      maxLines: null,
                       minLines: 15,
-                      style: AppTypography.body1
-                          .copyWith(color: AppColors.grayScale_750),
+                      style: AppTypography.body1.copyWith(color: AppColors.grayScale_750),
                     ),
                   SizedBox(height: 16),
                   Row(
