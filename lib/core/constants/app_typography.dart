@@ -110,5 +110,12 @@ class AppTypography {
     letterSpacing: -2 / 100,
   );
 
-  static var caption;
+  // 캡션 스타일 (누락되어 있던 부분 추가)
+  static const caption = TextStyle(
+    fontFamily: '$_baseFontFamily',
+    fontWeight: FontWeight.normal,
+    fontSize: 11,
+    height: 16 / 11,
+    letterSpacing: -2 / 100,
+  );
 }

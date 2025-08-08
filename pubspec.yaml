@@ -114,5 +114,6 @@ flutter:
 
 flutter_launcher_icons:
   ios: true
-  image_path: "assets/icon/icon.png"  # 아이콘 원본 경로
+  android: true
+  image_path: "assets/icon/icon3.png"  # 아이콘 원본 경로
   remove_alpha_ios: true

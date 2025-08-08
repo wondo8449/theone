@@ -13,17 +13,18 @@ class MainHeader extends StatelessWidget {
       height: 35,
       width: double.infinity,
       alignment: Alignment.centerLeft,
+      color: AppColors.color1,
       child: Padding(
           padding: const EdgeInsets.only(left: 16),
           child: selectedIndex == 0
             ? Text(
                 'THE ONE',
-                style: AppTypography.headline1.copyWith(color: AppColors.primary_450)
+                style: AppTypography.headline1.copyWith(color: AppColors.color2)
               )
               : Text(
                 _getPageTitle(selectedIndex),
                 style: AppTypography.headline3.copyWith(
-                  color: AppColors.grayScale_950,
+                  color: AppColors.color2,
                 ),
               ),
       ),

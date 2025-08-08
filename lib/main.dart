@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:theone/core/constants/app_colors.dart';
 import 'package:theone/features/auth/presentation/accepted_page.dart';
 import 'package:theone/features/auth/presentation/my_page.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
@@ -24,12 +25,18 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR', null);
+
+  // iOS와 Android 모두에 적용되는 설정
   SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-    )
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // iOS에서는 투명으로 설정
+        statusBarIconBrightness: Brightness.dark, // 아이콘을 어둡게
+        statusBarBrightness: Brightness.light, // iOS 전용: 상태바를 밝게 (배경이 밝을 때)
+        systemNavigationBarColor: AppColors.color1,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      )
   );
+
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -89,5 +96,3 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
-
-

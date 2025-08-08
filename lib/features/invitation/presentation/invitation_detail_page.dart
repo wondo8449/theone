@@ -45,18 +45,15 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
             if (!isInitialized) {
               for (var field in fields) {
                 _controllers[field]?.text = invitationData[field] ?? '';
-                // Edit 데이터도 함께 초기화
                 ref.read(invitationEditControllerProvider.notifier)
                     .updateEditDataField(field, invitationData[field] ?? '');
               }
 
-              // 날짜 필드도 초기화
               ref.read(invitationEditControllerProvider.notifier)
                   .updateEditDataField('startDate', invitationData['startDate'] ?? '');
               ref.read(invitationEditControllerProvider.notifier)
                   .updateEditDataField('endDate', invitationData['endDate'] ?? '');
 
-              // 진행 상태도 초기화
               final progressMap = {0: '진행중', 1: '종료', 2: '중단'};
               final progress = invitationData['progress'];
               if (progressMap.containsKey(progress)) {
@@ -84,29 +81,53 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
     final int id = ModalRoute.of(context)!.settings.arguments as int;
     final authState = ref.watch(authProvider);
     final loginId = authState['loginId'];
-
     final invitationDetail = ref.watch(invitationDetailProvider(id));
     final progressState = ref.watch(invitationStatusProvider);
 
     return Scaffold(
+      backgroundColor: AppColors.color1,
       appBar: AppBar(
-        title: Text('풍삶초 상세', style: AppTypography.headline3),
+        backgroundColor: AppColors.color1,
+        elevation: 0,
+        title: Text(
+          '풍삶초 상세',
+          style: AppTypography.headline3.copyWith(color: AppColors.color2),
+        ),
         centerTitle: true,
-        automaticallyImplyLeading: true,
+        iconTheme: IconThemeData(color: AppColors.color2),
         actions: [
           invitationDetail.when(
             data: (data) {
               final invitationData = data as Map<String, dynamic>;
               return PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, color: AppColors.grayScale_950),
+                icon: Icon(Icons.more_vert, color: AppColors.color2),
+                color: Colors.white,
                 onSelected: (value) =>
                     _handleMenuSelection(context, value, invitationData, ref),
                 itemBuilder: (BuildContext context) {
                   return [
                     if (loginId != invitationData['userName'])
-                    PopupMenuItem(value: 'report', child: Text('신고하기')),
+                      PopupMenuItem(
+                        value: 'report',
+                        child: Row(
+                          children: [
+                            Icon(Icons.report_outlined, color: AppColors.red, size: 20),
+                            SizedBox(width: 8),
+                            Text('신고하기', style: TextStyle(color: AppColors.red)),
+                          ],
+                        ),
+                      ),
                     if (loginId == invitationData['userName'])
-                      PopupMenuItem(value: 'delete', child: Text('삭제하기')),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, color: AppColors.red, size: 20),
+                            SizedBox(width: 8),
+                            Text('삭제하기', style: TextStyle(color: AppColors.red)),
+                          ],
+                        ),
+                      ),
                   ];
                 },
               );
@@ -114,102 +135,235 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
             loading: () => SizedBox.shrink(),
             error: (error, stack) => SizedBox.shrink(),
           ),
-        ]
+        ],
       ),
       body: GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-        child: Padding(
-        padding: AppSpacing.medium16,
+        onTap: () => FocusScope.of(context).unfocus(),
         child: invitationDetail.when(
           data: (data) {
-            return ListView(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    _readOnlyField('이끄미', data['userName']),
-                    SizedBox(width: 30),
-                    _readOnlyField('따르미', data['followerName'])
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    DateField(
-                      keyName: 'startDate',
-                      label: '시작일자',
-                      initialValue: data['startDate'],
-                      ref: ref,
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // 기본 정보 카드
+                  Container(
+                    width: double.infinity,
+                    padding: EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.color6.withOpacity(0.2),
+                          offset: Offset(0, 2),
+                          blurRadius: 8,
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 30),
-                    DateField(
-                      keyName: 'endDate',
-                      label: '종료일자',
-                      initialValue: data['endDate'],
-                      ref: ref,
-                    )
-                  ],
-                ),
-                Text('진행상태', style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
-                DropdownButton<String>(
-                  value: progressState,
-                  onChanged: (String? value) {
-                    if (value != null) {
-                      ref.read(invitationStatusProvider.notifier).state = value;
-                    }
-                  },
-                  items: ['진행중', '종료', '중단']
-                      .map((status) => DropdownMenuItem(value: status, child: Text(status)))
-                      .toList(),
-                ),
-                SizedBox(height: 20),
-                _editableField(context, ref, 'meetingDate', '만남 일정', '매주 만나는 요일과 시간', '시작 시 작성', data['meetingDate']),
-                _editableField(context, ref, 'followerExpectation', '따르미에 대한 기대', '풍삶초를 시작하며 따르미가 어떤 기대나 소망을 가지고 시작하는지', '시작 시 작성', data['followerExpectation']),
-                _editableField(context, ref, 'myExpectation', '이끄미로서의 기대', '풍삶초를 시작하며 이끄미로써 어떤 기대나 소망을 가지고 시작하는지', '시작 시 작성', data['myExpectation']),
-                _editableField(context, ref, 'followerPray', '따르미 기도제목', '따르미의 기도제목', '시작 시 작성', data['followerPray']),
-                _editableField(context, ref, 'myPray', '이끄미 기도제목', '이끄미의 기도제목', '시작 시 작성', data['myPray']),
-                _editableField(context, ref, 'followerChange', '따르미의 변화 과정', '풍삶초를 통한 따르미의 변화된 점, 새롭게 알게 된 내용이나 중요하게 생각하게 된 부분, 결심하게 된 부분', '4~5주차 작성', data['followerChange']),
-                _editableField(context, ref, 'myChange', '이끄미의 변화 과정', '중요하게 생각하게 된 내용, 따르미의 대화를 통하여 도전받은 부분,  결심하게 된 부분 ', '4~5주차 작성', data['myChange']),
-                _editableField(context, ref, 'feedback', '풍삶초를 돌아보며', '1) 따르미의 성장 관찰 \n2) 이끄미로서 배우고 느낀 점 \n3) 풍삶초를 마무리하며 나누고 싶은 점', '종료 시 작성 (가장 중요)', data['feedback']),
-                SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    final updated = ref.read(invitationEditDataProvider);
-                    final progressMap = {'진행중': 0, '종료': 1, '중단': 2};
-                    final dataToSend = {
-                      ...updated,
-                      'invitationId': data['invitationId'],
-                      'progress': progressMap[progressState],
-                    };
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '기본 정보',
+                          style: AppTypography.headline5.copyWith(
+                            color: AppColors.color2,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 16),
 
-                    ref.read(sendInvitationUpdateProvider((dataToSend, data['invitationId'])).future).then((_) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('저장되었습니다.'),
-                          behavior: SnackBarBehavior.floating,
+                        Row(
+                          children: [
+                            Expanded(child: _readOnlyField('이끄미', data['userName'])),
+                            SizedBox(width: 16),
+                            Expanded(child: _readOnlyField('따르미', data['followerName'])),
+                          ],
                         ),
-                      );
-                    }).catchError((e) {
-                      print(e);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('저장에 실패했습니다.'),
-                          backgroundColor: Colors.red,
+
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DateField(
+                                keyName: 'startDate',
+                                label: '시작일자',
+                                initialValue: data['startDate'],
+                                ref: ref,
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: DateField(
+                                keyName: 'endDate',
+                                label: '종료일자',
+                                initialValue: data['endDate'],
+                                ref: ref,
+                              ),
+                            ),
+                          ],
                         ),
-                      );
-                    });
-                  },
-                  child: Text('수정하기'),
-                ),
-              ],
+
+                        Text(
+                          '진행상태',
+                          style: AppTypography.body2.copyWith(
+                            color: AppColors.color3,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: AppColors.color5,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: progressState,
+                              onChanged: (String? value) {
+                                if (value != null) {
+                                  ref.read(invitationStatusProvider.notifier).state = value;
+                                }
+                              },
+                              style: AppTypography.body1.copyWith(color: AppColors.color2),
+                              items: ['진행중', '종료', '중단']
+                                  .map((status) => DropdownMenuItem(
+                                value: status,
+                                child: Text(status),
+                              ))
+                                  .toList(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // 상세 내용 카드들
+                  ..._buildDetailCards(data),
+
+                  SizedBox(height: 20),
+
+                  // 수정 버튼
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: AppColors.color4,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: TextButton(
+                      onPressed: () {
+                        final updated = ref.read(invitationEditDataProvider);
+                        final progressMap = {'진행중': 0, '종료': 1, '중단': 2};
+                        final dataToSend = {
+                          ...updated,
+                          'invitationId': data['invitationId'],
+                          'progress': progressMap[progressState],
+                        };
+
+                        ref.read(sendInvitationUpdateProvider((dataToSend, data['invitationId'])).future).then((_) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('저장되었습니다.'),
+                              backgroundColor: AppColors.color4,
+                            ),
+                          );
+                        }).catchError((e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('저장에 실패했습니다.'),
+                              backgroundColor: AppColors.red,
+                            ),
+                          );
+                        });
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Text(
+                        '수정하기',
+                        style: AppTypography.buttonLabelMedium.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  SizedBox(height: 40),
+                ],
+              ),
             );
           },
-          loading: () => Center(child: CircularProgressIndicator()),
-          error: (e, st) => Center(child: Text('오류 발생: $e')),
+          loading: () => Center(
+            child: CircularProgressIndicator(color: AppColors.color4),
+          ),
+          error: (e, st) => Center(
+            child: Container(
+              padding: EdgeInsets.all(32),
+              margin: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.color3),
+                  SizedBox(height: 16),
+                  Text('오류 발생: $e', style: AppTypography.body1.copyWith(color: AppColors.color3)),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
-      )
     );
+  }
+
+  List<Widget> _buildDetailCards(Map<String, dynamic> data) {
+    final cardData = [
+      {'key': 'meetingDate', 'title': '만남 일정', 'desc': '매주 만나는 요일과 시간', 'when': '시작 시 작성'},
+      {'key': 'followerExpectation', 'title': '따르미에 대한 기대', 'desc': '풍삶초를 시작하며 따르미가 어떤 기대나 소망을 가지고 시작하는지', 'when': '시작 시 작성'},
+      {'key': 'myExpectation', 'title': '이끄미로서의 기대', 'desc': '풍삶초를 시작하며 이끄미로써 어떤 기대나 소망을 가지고 시작하는지', 'when': '시작 시 작성'},
+      {'key': 'followerPray', 'title': '따르미 기도제목', 'desc': '따르미의 기도제목', 'when': '시작 시 작성'},
+      {'key': 'myPray', 'title': '이끄미 기도제목', 'desc': '이끄미의 기도제목', 'when': '시작 시 작성'},
+      {'key': 'followerChange', 'title': '따르미의 변화 과정', 'desc': '풍삶초를 통한 따르미의 변화된 점, 새롭게 알게 된 내용이나 중요하게 생각하게 된 부분, 결심하게 된 부분', 'when': '4~5주차 작성'},
+      {'key': 'myChange', 'title': '이끄미의 변화 과정', 'desc': '중요하게 생각하게 된 내용, 따르미의 대화를 통하여 도전받은 부분, 결심하게 된 부분', 'when': '4~5주차 작성'},
+      {'key': 'feedback', 'title': '풍삶초를 돌아보며', 'desc': '1) 따르미의 성장 관찰\n2) 이끄미로서 배우고 느낀 점\n3) 풍삶초를 마무리하며 나누고 싶은 점', 'when': '종료 시 작성 (가장 중요)'},
+    ];
+
+    return cardData.map((item) => Container(
+      width: double.infinity,
+      margin: EdgeInsets.only(bottom: 16),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.color6.withOpacity(0.2),
+            offset: Offset(0, 2),
+            blurRadius: 8,
+          ),
+        ],
+      ),
+      child: _editableField(
+        context,
+        ref,
+        item['key'] as String,
+        item['title'] as String,
+        item['desc'] as String,
+        item['when'] as String,
+        data[item['key']] as String,
+      ),
+    )).toList();
   }
 
   void _handleMenuSelection(
@@ -230,20 +384,19 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
             CupertinoDialogAction(
               onPressed: () async {
                 Navigator.pop(context);
-
                 try {
                   await ref.read(deleteInvitationProvider(id).future);
-
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('신고가 접수되었습니다.')),
+                    SnackBar(
+                      content: Text('신고가 접수되었습니다.'),
+                      backgroundColor: AppColors.color4,
+                    ),
                   );
-
-                } catch(e) {
-                  print('신고 실패: $e');
+                } catch (e) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('신고에 실패했습니다.'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.red,
                     ),
                   );
                 }
@@ -268,21 +421,20 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
             CupertinoDialogAction(
               onPressed: () async {
                 Navigator.pop(context);
-
                 try {
                   await ref.read(deleteInvitationProvider(id).future);
-
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('삭제가 완료되었습니다.')),
+                    SnackBar(
+                      content: Text('삭제가 완료되었습니다.'),
+                      backgroundColor: AppColors.color4,
+                    ),
                   );
-
                   Navigator.pop(context);
                 } catch (error) {
-                  print('삭제 실패: $error');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text('삭제에 실패했습니다.'),
-                      backgroundColor: Colors.red,
+                      backgroundColor: AppColors.red,
                     ),
                   );
                 }
@@ -300,8 +452,29 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
-        Text(value, style: AppTypography.body1),
+        Text(
+          label,
+          style: AppTypography.body2.copyWith(
+            color: AppColors.color3,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.color5,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            value,
+            style: AppTypography.body1.copyWith(
+              color: AppColors.color2,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
         SizedBox(height: 16),
       ],
     );
@@ -318,7 +491,6 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
       ) {
     final controller = _controllers[key]!;
 
-    // ⚠️ addListener 중복 방지: isInitialized 조건 체크
     if (isInitialized && !controller.hasListeners) {
       controller.addListener(() {
         ref.read(invitationEditControllerProvider.notifier)
@@ -330,33 +502,64 @@ class _InvitationDetailPageState extends ConsumerState<InvitationDetailPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Text(label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
+            Text(
+              label,
+              style: AppTypography.body1.copyWith(
+                color: AppColors.color2,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             SizedBox(width: 8),
-            Text(when, style: AppTypography.body2.copyWith(color: AppColors.grayScale_450))
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.color4,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                when,
+                style: AppTypography.caption.copyWith(
+                  color: Colors.white,
+                  fontSize: 10,
+                ),
+              ),
+            ),
           ],
         ),
         SizedBox(height: 8),
-        Text(description, style: AppTypography.body2.copyWith(color: AppColors.grayScale_450)),
+        Text(
+          description,
+          style: AppTypography.body3.copyWith(
+            color: AppColors.color3,
+            height: 1.4,
+          ),
+        ),
         SizedBox(height: 8),
         TextFormField(
           controller: controller,
           minLines: 3,
-          maxLines: 3,
+          maxLines: 5,
           scrollPhysics: BouncingScrollPhysics(),
           keyboardType: TextInputType.multiline,
+          style: AppTypography.body2.copyWith(color: AppColors.color2),
           decoration: InputDecoration(
             filled: true,
-            fillColor: AppColors.grayScale_050,
-            border: OutlineInputBorder(borderRadius: AppBorderRadius.small8),
+            fillColor: AppColors.color5,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: AppColors.color2, width: 2),
+            ),
+            contentPadding: EdgeInsets.all(12),
           ),
         ),
-        SizedBox(height: 16),
       ],
     );
   }
-
 }
 
 class DateField extends StatefulWidget {
@@ -387,7 +590,6 @@ class _DateFieldState extends State<DateField> {
     selectedDate = DateTime.tryParse(widget.initialValue) ?? DateTime.now();
     displayText = DateFormat('yyyy년 M월 d일').format(selectedDate);
 
-    // ✅ 초기값 상태 반영
     final formatted = DateFormat('yyyy-MM-dd').format(selectedDate);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.ref.read(invitationEditControllerProvider.notifier).updateEditDataField(widget.keyName, formatted);
@@ -409,8 +611,14 @@ class _DateFieldState extends State<DateField> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: AppTypography.headline5.copyWith(color: AppColors.primary_450)),
-        const SizedBox(height: 4),
+        Text(
+          widget.label,
+          style: AppTypography.body2.copyWith(
+            color: AppColors.color3,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        SizedBox(height: 8),
         InkWell(
           onTap: () {
             showCupertinoModalPopup(
@@ -427,7 +635,10 @@ class _DateFieldState extends State<DateField> {
                           Navigator.of(context).pop();
                           _updateDate(selectedDate);
                         },
-                        child: Text('완료', style: TextStyle(color: AppColors.primary_450)),
+                        child: Text(
+                          '완료',
+                          style: TextStyle(color: AppColors.color2),
+                        ),
                       ),
                     ),
                     Expanded(
@@ -445,16 +656,19 @@ class _DateFieldState extends State<DateField> {
             );
           },
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            width: double.infinity,
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.grayScale_050,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: AppBorderRadius.small8,
+              color: AppColors.color5,
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(displayText, style: AppTypography.body1),
+            child: Text(
+              displayText,
+              style: AppTypography.body1.copyWith(color: AppColors.color2),
+            ),
           ),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
       ],
     );
   }

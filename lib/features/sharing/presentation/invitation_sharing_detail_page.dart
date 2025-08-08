@@ -44,23 +44,45 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
     }
 
     return Scaffold(
+      backgroundColor: AppColors.color1,
       appBar: AppBar(
-        title: Text('풍삶초 나눔', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '풍삶초 나눔',
+          style: AppTypography.headline3.copyWith(
+            color: AppColors.color2,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         centerTitle: true,
-        automaticallyImplyLeading: true,
+        iconTheme: IconThemeData(color: AppColors.color2),
         actions: [
           invitationDetail.when(
             data: (data) {
               final invitationData = data as Map<String, dynamic>;
               return PopupMenuButton<String>(
-                icon: Icon(Icons.more_vert, color: AppColors.grayScale_950),
+                icon: Icon(Icons.more_vert, color: AppColors.color2),
+                color: Colors.white,
                 onSelected: (value) =>
                     _handleMenuSelection(context, value, invitationData, ref),
                 itemBuilder: (BuildContext context) {
                   return [
-                    PopupMenuItem(value: 'report', child: Text('신고하기')),
+                    PopupMenuItem(
+                      value: 'report',
+                      child: Text(
+                        '신고하기',
+                        style: TextStyle(color: AppColors.color3),
+                      ),
+                    ),
                     if (loginId == invitationData['userName'])
-                      PopupMenuItem(value: 'delete', child: Text('삭제하기')),
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Text(
+                          '삭제하기',
+                          style: TextStyle(color: AppColors.color3),
+                        ),
+                      ),
                   ];
                 },
               );
@@ -72,140 +94,231 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
       ),
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: invitationDetail.when(
-            data: (data) {
-              final invitationData = data as Map<String, dynamic>;
+        child: invitationDetail.when(
+          data: (data) {
+            final invitationData = data as Map<String, dynamic>;
 
-              if (!isInitialized) {
-                titleController.text = invitationData['title'] ?? '';
-                contentController.text = invitationData['content'] ?? '';
-                isInitialized = true;
-              }
+            if (!isInitialized) {
+              titleController.text = invitationData['title'] ?? '';
+              contentController.text = invitationData['content'] ?? '';
+              isInitialized = true;
+            }
 
-              return ListView(
-                children: [
-                  Text('제목',
-                      style: AppTypography.headline5
-                          .copyWith(color: AppColors.primary_450)),
-                  if (loginId == invitationData['userName'])
-                    TextField(
-                      controller: titleController,
-                      decoration: InputDecoration(
-                        hintText: '제목을 입력해주세요.',
-                        enabledBorder: UnderlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.zero),
-                        ),
-                        disabledBorder: InputBorder.none,
+            return SingleChildScrollView(
+              padding: EdgeInsets.all(16),
+              child: Container(
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '제목',
+                      style: AppTypography.headline5.copyWith(
+                        color: AppColors.color2,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  if (loginId != invitationData['userName'])
-                    TextField(
-                      controller: titleController,
-                      enabled: false,
-                      decoration: InputDecoration(
-                        hintText: '제목을 입력해주세요.',
-                        enabledBorder: UnderlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.zero),
-                        ),
-                        border: InputBorder.none,
-                        disabledBorder: InputBorder.none,
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.color5,
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                  SizedBox(height: 16),
-                  Text('내용',
-                      style: AppTypography.headline5
-                          .copyWith(color: AppColors.primary_450)),
-                  SizedBox(height: 16),
-                  if (loginId == invitationData['userName'])
-                    TextField(
-                      controller: contentController,
-                      decoration: InputDecoration(
-                        hintText: '내용을 입력해주세요.',
-                        contentPadding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 12.0),
-                        disabledBorder: InputBorder.none,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                      child: TextField(
+                        controller: titleController,
+                        enabled: loginId == invitationData['userName'],
+                        style: AppTypography.body1.copyWith(
+                          color: AppColors.color2,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '제목을 입력해주세요.',
+                          hintStyle: TextStyle(color: AppColors.color3),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(16),
                         ),
                       ),
-                      maxLines: 15,
-                      minLines: 15,
-                      style: AppTypography.body1
-                          .copyWith(color: AppColors.grayScale_750),
                     ),
-                  if (loginId != invitationData['userName'])
-                    TextField(
-                      controller: contentController,
-                      enabled: false,
-                      decoration: InputDecoration(
-                        hintText: '내용을 입력해주세요.',
-                        border: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 12.0),
+                    SizedBox(height: 24),
+                    Text(
+                      '내용',
+                      style: AppTypography.headline5.copyWith(
+                        color: AppColors.color2,
+                        fontWeight: FontWeight.bold,
                       ),
-                      maxLines: null,
-                      minLines: 15,
-                      style: AppTypography.body1.copyWith(color: AppColors.grayScale_750),
                     ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('작성자 : ${invitationData['userName']}',
-                          style: AppTypography.headline5
-                              .copyWith(color: AppColors.grayScale_550)),
-                      Text('작성일 : ${formatDate(invitationData['createdAt'])}',
-                          style: AppTypography.headline5
-                              .copyWith(color: AppColors.grayScale_550)),
+                    SizedBox(height: 12),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.color5,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextField(
+                        controller: contentController,
+                        enabled: loginId == invitationData['userName'],
+                        maxLines: 15,
+                        minLines: 15,
+                        style: AppTypography.body1.copyWith(
+                          color: AppColors.color2,
+                          height: 1.4,
+                        ),
+                        decoration: InputDecoration(
+                          hintText: '내용을 입력해주세요.',
+                          hintStyle: TextStyle(color: AppColors.color3),
+                          border: InputBorder.none,
+                          contentPadding: EdgeInsets.all(16),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.color6,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '작성자',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.color3,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                invitationData['userName'],
+                                style: AppTypography.body2.copyWith(
+                                  color: AppColors.color2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '작성일',
+                                style: AppTypography.caption.copyWith(
+                                  color: AppColors.color3,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                formatDate(invitationData['createdAt']),
+                                style: AppTypography.body2.copyWith(
+                                  color: AppColors.color2,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (loginId == invitationData['userName']) ...[
+                      SizedBox(height: 32),
+                      Container(
+                        width: double.infinity,
+                        height: 52,
+                        decoration: BoxDecoration(
+                          color: AppColors.color2,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            final title = titleController.text;
+                            final content = contentController.text;
+
+                            if (title.isEmpty) {
+                              _showErrorDialog(context, '제목을 입력해주세요.');
+                              return;
+                            }
+
+                            if (content.isEmpty) {
+                              _showErrorDialog(context, '내용을 입력해주세요.');
+                              return;
+                            }
+
+                            final data = {'title': title, 'content': content};
+
+                            ref.read(modifySharingDataProvider((id, data)).future).then((_) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '수정이 완료되었습니다.',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: AppColors.color4,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            }).catchError((error) {
+                              print('수정 실패: $error');
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    '수정에 실패했습니다.',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: AppColors.color3,
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            });
+                          },
+                          style: TextButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            '수정하기',
+                            style: AppTypography.buttonLabelMedium.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
+                  ],
+                ),
+              ),
+            );
+          },
+          loading: () => Center(
+            child: CircularProgressIndicator(
+              color: AppColors.color4,
+            ),
+          ),
+          error: (error, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 48,
+                  color: AppColors.color3,
+                ),
+                SizedBox(height: 16),
+                Text(
+                  '데이터 로드 실패',
+                  style: AppTypography.headline6.copyWith(
+                    color: AppColors.color3,
                   ),
-                  SizedBox(height: 16),
-                  if (loginId == invitationData['userName'])
-                    ElevatedButton(
-                      onPressed: () {
-                        final title = titleController.text;
-                        final content = contentController.text;
-
-                        if (title.isEmpty) {
-                          _showErrorDialog(context, '제목을 입력해주세요.');
-                          return;
-                        }
-
-                        if (content.isEmpty) {
-                          _showErrorDialog(context, '내용을 입력해주세요.');
-                          return;
-                        }
-
-                        final data = {'title': title, 'content': content};
-
-                        ref.read(modifySharingDataProvider((id, data)).future).then((_) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('수정이 완료되었습니다.'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        }).catchError((error) {
-                          print('수정 실패: $error');
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('수정에 실패했습니다.'),
-                              backgroundColor: Colors.red,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
-                        });
-                      },
-                      child: Text('수정하기'),
-                    ),
-                ],
-              );
-            },
-            loading: () => Center(child: CircularProgressIndicator()),
-            error: (error, stack) =>
-                Center(child: Text('데이터 로드 실패: $error')),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -220,12 +333,21 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: Text('신고하기'),
-          content: Text('해당 나눔을 신고하시겠습니까?'),
+          title: Text(
+            '신고하기',
+            style: TextStyle(color: AppColors.color2),
+          ),
+          content: Text(
+            '해당 나눔을 신고하시겠습니까?',
+            style: TextStyle(color: AppColors.color3),
+          ),
           actions: [
             CupertinoDialogAction(
               onPressed: () => Navigator.pop(context),
-              child: Text('취소'),
+              child: Text(
+                '취소',
+                style: TextStyle(color: AppColors.color3),
+              ),
             ),
             CupertinoDialogAction(
               onPressed: () async {
@@ -235,21 +357,33 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
                   await ref.read(declarationSharingProvider(id).future);
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('신고가 접수되었습니다.')),
+                    SnackBar(
+                      content: Text(
+                        '신고가 접수되었습니다.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.color4,
+                    ),
                   );
 
                 } catch(e) {
                   print('신고 실패: $e');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('신고에 실패했습니다.'),
-                      backgroundColor: Colors.red,
+                      content: Text(
+                        '신고에 실패했습니다.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.color3,
                     ),
                   );
                 }
               },
               isDestructiveAction: true,
-              child: Text('신고'),
+              child: Text(
+                '신고',
+                style: TextStyle(color: AppColors.color2),
+              ),
             ),
           ],
         ),
@@ -258,12 +392,21 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: Text('삭제하기'),
-          content: Text('정말 삭제하시겠습니까?\n삭제 후 되돌릴 수 없습니다.'),
+          title: Text(
+            '삭제하기',
+            style: TextStyle(color: AppColors.color2),
+          ),
+          content: Text(
+            '정말 삭제하시겠습니까?\n삭제 후 되돌릴 수 없습니다.',
+            style: TextStyle(color: AppColors.color3),
+          ),
           actions: [
             CupertinoDialogAction(
               onPressed: () => Navigator.pop(context),
-              child: Text('취소'),
+              child: Text(
+                '취소',
+                style: TextStyle(color: AppColors.color3),
+              ),
             ),
             CupertinoDialogAction(
               onPressed: () async {
@@ -273,7 +416,13 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
                   await ref.read(deleteSharingProvider(id).future);
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('삭제가 완료되었습니다.')),
+                    SnackBar(
+                      content: Text(
+                        '삭제가 완료되었습니다.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.color4,
+                    ),
                   );
 
                   Navigator.pop(context);
@@ -281,14 +430,20 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
                   print('삭제 실패: $error');
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('삭제에 실패했습니다.'),
-                      backgroundColor: Colors.red,
+                      content: Text(
+                        '삭제에 실패했습니다.',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: AppColors.color3,
                     ),
                   );
                 }
               },
               isDestructiveAction: true,
-              child: Text('삭제'),
+              child: Text(
+                '삭제',
+                style: TextStyle(color: AppColors.color2),
+              ),
             ),
           ],
         ),
@@ -301,12 +456,22 @@ class _InvitationSharingDetailPageState extends ConsumerState<InvitationSharingD
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('알림'),
-          content: Text(message),
+          backgroundColor: Colors.white,
+          title: Text(
+            '알림',
+            style: TextStyle(color: AppColors.color2),
+          ),
+          content: Text(
+            message,
+            style: TextStyle(color: AppColors.color3),
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('확인'),
+              child: Text(
+                '확인',
+                style: TextStyle(color: AppColors.color2),
+              ),
             ),
           ],
         );

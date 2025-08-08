@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:theone/features/auth/provider/auth_provider.dart';
 import 'package:theone/features/auth/data/auth_api.dart';
-
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_typography.dart';
 
@@ -27,7 +26,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       );
 
       final authState = ref.read(authProvider);
-
       final isAccepted = authState['isAccepted'];
       print('isAccepted : ' + isAccepted!);
 
@@ -40,7 +38,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('로그인 실패: 아이디 또는 비밀번호를 확인하세요.'),
-          backgroundColor: Colors.red,
+          backgroundColor: AppColors.red,
         ),
       );
     }
@@ -49,27 +47,145 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('로그인', style: AppTypography.headline3.copyWith(color: AppColors.grayScale_950)), centerTitle: true),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _usernameController,
-              decoration: InputDecoration(labelText: '아이디'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: '비밀번호'),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _handleLogin,
-              child: Text('로그인'),
-            ),
-          ],
+      backgroundColor: AppColors.color1,
+      appBar: AppBar(
+        backgroundColor: AppColors.color1,
+        title: Text(
+          '로그인',
+          style: AppTypography.headline3.copyWith(color: AppColors.color2),
+        ),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // 로고 영역
+              Container(
+                padding: EdgeInsets.all(32),
+                margin: EdgeInsets.only(bottom: 48),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.color6.withOpacity(0.3),
+                      offset: Offset(0, 4),
+                      blurRadius: 12,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Text(
+                      'THE ONE',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.color2,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      '로그인하여 시작하세요',
+                      style: AppTypography.body2.copyWith(
+                        color: AppColors.color3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 입력 필드 영역
+              Container(
+                padding: EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.color6.withOpacity(0.2),
+                      offset: Offset(0, 2),
+                      blurRadius: 8,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _usernameController,
+                      style: AppTypography.body1.copyWith(color: AppColors.color2),
+                      decoration: InputDecoration(
+                        labelText: '아이디',
+                        labelStyle: AppTypography.body2.copyWith(color: AppColors.color3),
+                        filled: true,
+                        fillColor: AppColors.color5,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.color2, width: 2),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      obscureText: true,
+                      style: AppTypography.body1.copyWith(color: AppColors.color2),
+                      decoration: InputDecoration(
+                        labelText: '비밀번호',
+                        labelStyle: AppTypography.body2.copyWith(color: AppColors.color3),
+                        filled: true,
+                        fillColor: AppColors.color5,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.color2, width: 2),
+                        ),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      ),
+                    ),
+                    SizedBox(height: 24),
+                    Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.color2,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextButton(
+                        onPressed: _handleLogin,
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          '로그인',
+                          style: AppTypography.buttonLabelMedium.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

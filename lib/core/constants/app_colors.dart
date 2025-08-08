@@ -27,4 +27,11 @@ abstract class AppColors {
   //
   static const Color yellow = Color(0xFFFEE500);
   static const Color deepYellow = Color(0xFFF0D800);
+
+  static const Color color1 = Color(0xFFE7E5DF);
+  static const Color color2 = Color(0xFF333333);
+  static const Color color3 = Color(0xFF777777);
+  static const Color color4 = Color(0xFFA89F91);
+  static const Color color5 = Color(0xFFDAD7D0);
+  static const Color color6 = Color(0xFFC1BFB8);
 }
