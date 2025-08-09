@@ -6,8 +6,13 @@ class SharingApi {
 
   SharingApi(this.apiClient);
 
-  Future<List<Map<String, dynamic>>> getQTSharingList() async {
-    final responseRaw = await apiClient.request('GET', '/sharing/0', null);
+  Future<List<Map<String, dynamic>>> getQTSharingList({int page = 1, String? searchValue}) async {
+    String url = '/sharing/0?page=$page';
+    if (searchValue != null && searchValue.isNotEmpty) {
+      url += '&searchValue=${Uri.encodeComponent(searchValue)}';
+    }
+
+    final responseRaw = await apiClient.request('GET', url, null);
     final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
 
     if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
@@ -26,8 +31,13 @@ class SharingApi {
     }
   }
 
-  Future<List<Map<String, dynamic>>> getInvitationSharingList() async {
-    final responseRaw = await apiClient.request('GET', '/sharing/1', null);
+  Future<List<Map<String, dynamic>>> getInvitationSharingList({int page = 1, String? searchValue}) async {
+    String url = '/sharing/1?page=$page';
+    if (searchValue != null && searchValue.isNotEmpty) {
+      url += '&searchValue=${Uri.encodeComponent(searchValue)}';
+    }
+
+    final responseRaw = await apiClient.request('GET', url, null);
     final decodedResponse = jsonDecode(utf8.decode(responseRaw.bodyBytes));
 
     if (decodedResponse is Map<String, dynamic> && decodedResponse.containsKey('data')) {
@@ -126,5 +136,4 @@ class SharingApi {
       throw Exception(e);
     }
   }
-
 }

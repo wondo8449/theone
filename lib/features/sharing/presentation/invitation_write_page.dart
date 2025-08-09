@@ -32,14 +32,11 @@ class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
     return Scaffold(
       backgroundColor: AppColors.color1,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.color1,
         elevation: 0,
         title: Text(
           '풍삶초 나눔 작성',
-          style: AppTypography.headline3.copyWith(
-            color: AppColors.color2,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.headline3.copyWith(color: AppColors.color2),
         ),
         centerTitle: true,
         iconTheme: IconThemeData(color: AppColors.color2),
@@ -49,77 +46,95 @@ class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
         child: SingleChildScrollView(
           padding: EdgeInsets.all(16),
           child: Container(
-            padding: EdgeInsets.all(24),
+            padding: EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.color6.withOpacity(0.3),
+                  offset: Offset(0, 4),
+                  blurRadius: 12,
+                ),
+              ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // 제목 섹션
                 Text(
                   '제목',
-                  style: AppTypography.headline5.copyWith(
-                    color: AppColors.color2,
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.body2.copyWith(
+                    color: AppColors.color3,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.color5,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: TextField(
-                    controller: titleController,
-                    style: AppTypography.body1.copyWith(
-                      color: AppColors.color2,
+                SizedBox(height: 8),
+                TextField(
+                  controller: titleController,
+                  style: AppTypography.body1.copyWith(color: AppColors.color2),
+                  decoration: InputDecoration(
+                    hintText: '제목을 입력해주세요.',
+                    hintStyle: AppTypography.body2.copyWith(color: AppColors.color3),
+                    filled: true,
+                    fillColor: AppColors.color5,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
-                    decoration: InputDecoration(
-                      hintText: '제목을 입력해주세요.',
-                      hintStyle: TextStyle(color: AppColors.color3),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.color2, width: 2),
                     ),
+                    contentPadding: EdgeInsets.all(16),
                   ),
                 ),
-                SizedBox(height: 24),
+                SizedBox(height: 20),
+
+                // 내용 섹션
                 Text(
                   '내용',
-                  style: AppTypography.headline5.copyWith(
-                    color: AppColors.color2,
-                    fontWeight: FontWeight.bold,
+                  style: AppTypography.body2.copyWith(
+                    color: AppColors.color3,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 12),
-                Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.color5,
-                    borderRadius: BorderRadius.circular(12),
+                SizedBox(height: 8),
+                TextField(
+                  controller: contentController,
+                  maxLines: 15,
+                  minLines: 15,
+                  style: AppTypography.body1.copyWith(
+                    color: AppColors.color2,
+                    height: 1.4,
                   ),
-                  child: TextField(
-                    controller: contentController,
-                    maxLines: 15,
-                    minLines: 15,
-                    style: AppTypography.body1.copyWith(
-                      color: AppColors.color2,
+                  decoration: InputDecoration(
+                    hintText: '풍삶초 나눔 내용을 입력해주세요.\n\n예시:\n- 풍삶초 경험담\n- 멘토링 후기\n- 성장 이야기\n- 받은 은혜나 깨달음',
+                    hintStyle: AppTypography.body2.copyWith(
+                      color: AppColors.color3,
                       height: 1.4,
                     ),
-                    decoration: InputDecoration(
-                      hintText: '내용을 입력해주세요.',
-                      hintStyle: TextStyle(color: AppColors.color3),
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(16),
+                    filled: true,
+                    fillColor: AppColors.color5,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
                     ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: AppColors.color2, width: 2),
+                    ),
+                    contentPadding: EdgeInsets.all(16),
                   ),
                 ),
                 SizedBox(height: 32),
+
+                // 저장 버튼
                 Container(
                   width: double.infinity,
-                  height: 52,
                   decoration: BoxDecoration(
-                    color: AppColors.color2,
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppColors.color4,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: TextButton(
                     onPressed: () async {
@@ -157,8 +172,9 @@ class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
                     },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
                     child: Text(
@@ -195,7 +211,7 @@ class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
             ),
           ),
           content: Text(
-            '풍삶초 나눔이 저장되었습니다.',
+            '풍삶초 나눔이 성공적으로 저장되었습니다.',
             style: AppTypography.body1.copyWith(
               color: AppColors.color3,
             ),
@@ -262,7 +278,7 @@ class _InvitationWritePageState extends ConsumerState<InvitationWritePage> {
           actions: <Widget>[
             Container(
               decoration: BoxDecoration(
-                color: AppColors.color3,
+                color: AppColors.red,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(

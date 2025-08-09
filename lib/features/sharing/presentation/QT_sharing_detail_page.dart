@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -47,14 +46,11 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
     return Scaffold(
       backgroundColor: AppColors.color1,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.color1,
         elevation: 0,
         title: Text(
           'QT 나눔',
-          style: AppTypography.headline3.copyWith(
-            color: AppColors.color2,
-            fontWeight: FontWeight.bold,
-          ),
+          style: AppTypography.headline3.copyWith(color: AppColors.color2),
         ),
         centerTitle: true,
         iconTheme: IconThemeData(color: AppColors.color2),
@@ -68,19 +64,26 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
                 onSelected: (value) => _handleMenuSelection(context, value, QTData, ref),
                 itemBuilder: (BuildContext context) {
                   return [
-                    PopupMenuItem(
-                      value: 'report',
-                      child: Text(
-                        '신고하기',
-                        style: TextStyle(color: AppColors.color3),
+                    if (loginId != QTData['userName'])
+                      PopupMenuItem(
+                        value: 'report',
+                        child: Row(
+                          children: [
+                            Icon(Icons.report_outlined, color: AppColors.red, size: 20),
+                            SizedBox(width: 8),
+                            Text('신고하기', style: TextStyle(color: AppColors.red)),
+                          ],
+                        ),
                       ),
-                    ),
                     if (loginId == QTData['userName'])
                       PopupMenuItem(
                         value: 'delete',
-                        child: Text(
-                          '삭제하기',
-                          style: TextStyle(color: AppColors.color3),
+                        child: Row(
+                          children: [
+                            Icon(Icons.delete_outline, color: AppColors.red, size: 20),
+                            SizedBox(width: 8),
+                            Text('삭제하기', style: TextStyle(color: AppColors.red)),
+                          ],
                         ),
                       ),
                   ];
@@ -107,131 +110,158 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
             return SingleChildScrollView(
               padding: EdgeInsets.all(16),
               child: Container(
-                padding: EdgeInsets.all(24),
+                padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.color6.withOpacity(0.3),
+                      offset: Offset(0, 4),
+                      blurRadius: 12,
+                    ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      '제목',
-                      style: AppTypography.headline5.copyWith(
-                        color: AppColors.color2,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.color5,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        controller: titleController,
-                        enabled: loginId == QTData['userName'],
-                        style: AppTypography.body1.copyWith(
-                          color: AppColors.color2,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: '제목을 입력해주세요.',
-                          hintStyle: TextStyle(color: AppColors.color3),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 24),
-                    Text(
-                      '내용',
-                      style: AppTypography.headline5.copyWith(
-                        color: AppColors.color2,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.color5,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: TextField(
-                        controller: contentController,
-                        enabled: loginId == QTData['userName'],
-                        maxLines: 15,
-                        minLines: 15,
-                        style: AppTypography.body1.copyWith(
-                          color: AppColors.color2,
-                          height: 1.4,
-                        ),
-                        decoration: InputDecoration(
-                          hintText: '내용을 입력해주세요.',
-                          hintStyle: TextStyle(color: AppColors.color3),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.all(16),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 24),
+                    // 작성자 정보
                     Container(
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.color6,
+                        color: AppColors.color5,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                '작성자',
-                                style: AppTypography.caption.copyWith(
-                                  color: AppColors.color3,
-                                ),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppColors.color2,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              'QT',
+                              style: AppTypography.caption.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
                               ),
-                              SizedBox(height: 4),
-                              Text(
-                                QTData['userName'],
-                                style: AppTypography.body2.copyWith(
-                                  color: AppColors.color2,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '작성일',
-                                style: AppTypography.caption.copyWith(
-                                  color: AppColors.color3,
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  QTData['userName'],
+                                  style: AppTypography.body1.copyWith(
+                                    color: AppColors.color2,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(height: 4),
-                              Text(
-                                formatDate(QTData['createdAt']),
-                                style: AppTypography.body2.copyWith(
-                                  color: AppColors.color2,
-                                  fontWeight: FontWeight.w600,
+                                SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.access_time,
+                                      size: 14,
+                                      color: AppColors.color3,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      formatDate(QTData['createdAt']),
+                                      style: AppTypography.caption.copyWith(
+                                        color: AppColors.color3,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
+                    SizedBox(height: 20),
+
+                    // 제목 섹션
+                    Text(
+                      '제목',
+                      style: AppTypography.body2.copyWith(
+                        color: AppColors.color3,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: titleController,
+                      enabled: loginId == QTData['userName'],
+                      style: AppTypography.body1.copyWith(color: AppColors.color2),
+                      decoration: InputDecoration(
+                        hintText: '제목을 입력해주세요.',
+                        hintStyle: AppTypography.body2.copyWith(color: AppColors.color3),
+                        filled: true,
+                        fillColor: loginId == QTData['userName']
+                            ? AppColors.color5
+                            : AppColors.color6,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.color2, width: 2),
+                        ),
+                        contentPadding: EdgeInsets.all(16),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+
+                    // 내용 섹션
+                    Text(
+                      '내용',
+                      style: AppTypography.body2.copyWith(
+                        color: AppColors.color3,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    TextField(
+                      controller: contentController,
+                      enabled: loginId == QTData['userName'],
+                      maxLines: 15,
+                      minLines: 15,
+                      style: AppTypography.body1.copyWith(
+                        color: AppColors.color2,
+                        height: 1.4,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: '내용을 입력해주세요.',
+                        hintStyle: AppTypography.body2.copyWith(color: AppColors.color3),
+                        filled: true,
+                        fillColor: loginId == QTData['userName']
+                            ? AppColors.color5
+                            : AppColors.color6,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.color2, width: 2),
+                        ),
+                        contentPadding: EdgeInsets.all(16),
+                      ),
+                    ),
+
                     if (loginId == QTData['userName']) ...[
                       SizedBox(height: 32),
                       Container(
                         width: double.infinity,
-                        height: 52,
                         decoration: BoxDecoration(
-                          color: AppColors.color2,
-                          borderRadius: BorderRadius.circular(16),
+                          color: AppColors.color4,
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: TextButton(
                           onPressed: () {
@@ -253,32 +283,24 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
                             ref.read(modifySharingDataProvider((id, data)).future).then((_) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                    '수정이 완료되었습니다.',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
+                                  content: Text('수정이 완료되었습니다.'),
                                   backgroundColor: AppColors.color4,
-                                  behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             }).catchError((error) {
-                              print('수정 실패: $error');
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                    '수정에 실패했습니다.',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  backgroundColor: AppColors.color3,
-                                  behavior: SnackBarBehavior.floating,
+                                  content: Text('수정에 실패했습니다.'),
+                                  backgroundColor: AppColors.red,
                                 ),
                               );
                             });
                           },
                           style: TextButton.styleFrom(
                             foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           child: Text(
@@ -297,27 +319,24 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
             );
           },
           loading: () => Center(
-            child: CircularProgressIndicator(
-              color: AppColors.color4,
-            ),
+            child: CircularProgressIndicator(color: AppColors.color4),
           ),
           error: (error, stack) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  size: 48,
-                  color: AppColors.color3,
-                ),
-                SizedBox(height: 16),
-                Text(
-                  '데이터 로드 실패',
-                  style: AppTypography.headline6.copyWith(
-                    color: AppColors.color3,
-                  ),
-                ),
-              ],
+            child: Container(
+              padding: EdgeInsets.all(32),
+              margin: EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: AppColors.color3),
+                  SizedBox(height: 16),
+                  Text('오류 발생', style: AppTypography.body1.copyWith(color: AppColors.color3)),
+                ],
+              ),
             ),
           ),
         ),
@@ -333,58 +352,35 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: Text(
-            '신고하기',
-            style: TextStyle(color: AppColors.color2),
-          ),
-          content: Text(
-            '해당 나눔을 신고하시겠습니까?',
-            style: TextStyle(color: AppColors.color3),
-          ),
+          title: Text('신고하기'),
+          content: Text('해당 나눔을 신고하시겠습니까?'),
           actions: [
             CupertinoDialogAction(
               onPressed: () => Navigator.pop(context),
-              child: Text(
-                '취소',
-                style: TextStyle(color: AppColors.color3),
-              ),
+              child: Text('취소'),
             ),
             CupertinoDialogAction(
               onPressed: () async {
-                final navigator = Navigator.of(context);
-                final messenger = ScaffoldMessenger.of(context);
-
-                navigator.pop();
-
+                Navigator.pop(context);
                 try {
                   await ref.read(declarationSharingProvider(id).future);
-                  messenger.showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        '신고가 접수되었습니다.',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      content: Text('신고가 접수되었습니다.'),
                       backgroundColor: AppColors.color4,
                     ),
                   );
                 } catch (e) {
-                  print('신고 실패: $e');
-                  messenger.showSnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        '신고에 실패했습니다.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: AppColors.color3,
+                      content: Text('신고에 실패했습니다.'),
+                      backgroundColor: AppColors.red,
                     ),
                   );
                 }
               },
               isDestructiveAction: true,
-              child: Text(
-                '신고',
-                style: TextStyle(color: AppColors.color2),
-              ),
+              child: Text('신고'),
             ),
           ],
         ),
@@ -393,58 +389,36 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
       showCupertinoDialog(
         context: context,
         builder: (context) => CupertinoAlertDialog(
-          title: Text(
-            '삭제하기',
-            style: TextStyle(color: AppColors.color2),
-          ),
-          content: Text(
-            '정말 삭제하시겠습니까?\n삭제 후 되돌릴 수 없습니다.',
-            style: TextStyle(color: AppColors.color3),
-          ),
+          title: Text('삭제하기'),
+          content: Text('정말 삭제하시겠습니까?\n삭제 후 되돌릴 수 없습니다.'),
           actions: [
             CupertinoDialogAction(
               onPressed: () => Navigator.pop(context),
-              child: Text(
-                '취소',
-                style: TextStyle(color: AppColors.color3),
-              ),
+              child: Text('취소'),
             ),
             CupertinoDialogAction(
               onPressed: () async {
                 Navigator.pop(context);
-
                 try {
                   await ref.read(deleteSharingProvider(id).future);
-
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        '삭제가 완료되었습니다.',
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      content: Text('삭제가 완료되었습니다.'),
                       backgroundColor: AppColors.color4,
                     ),
                   );
-
                   Navigator.pop(context);
-                } catch (e) {
-                  print('삭제 실패: $e');
+                } catch (error) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text(
-                        '삭제에 실패했습니다.',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      backgroundColor: AppColors.color3,
+                      content: Text('삭제에 실패했습니다.'),
+                      backgroundColor: AppColors.red,
                     ),
                   );
                 }
               },
               isDestructiveAction: true,
-              child: Text(
-                '삭제',
-                style: TextStyle(color: AppColors.color2),
-              ),
+              child: Text('삭제'),
             ),
           ],
         ),
@@ -477,7 +451,7 @@ class _QTSharingDetailPageState extends ConsumerState<QTSharingDetailPage> {
           actions: <Widget>[
             Container(
               decoration: BoxDecoration(
-                color: AppColors.color3,
+                color: AppColors.red,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: TextButton(

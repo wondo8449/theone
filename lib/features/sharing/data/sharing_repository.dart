@@ -5,12 +5,12 @@ class SharingRepository {
 
   SharingRepository(this.sharingApi);
 
-  Future<List<Map<String, dynamic>>> getQTSharingList() {
-    return sharingApi.getQTSharingList();
+  Future<List<Map<String, dynamic>>> getQTSharingList({int page = 1, String? searchValue}) {
+    return sharingApi.getQTSharingList(page: page, searchValue: searchValue);
   }
 
-  Future<List<Map<String, dynamic>>> getInvitationSharingList() {
-    return sharingApi.getInvitationSharingList();
+  Future<List<Map<String, dynamic>>> getInvitationSharingList({int page = 1, String? searchValue}) {
+    return sharingApi.getInvitationSharingList(page: page, searchValue: searchValue);
   }
 
   Future<Map<String, dynamic>> createSharing(Map<String, dynamic> data) {
@@ -32,5 +32,4 @@ class SharingRepository {
   Future<void> declarationSharing(int id) {
     return sharingApi.declarationSharing(id);
   }
-
 }

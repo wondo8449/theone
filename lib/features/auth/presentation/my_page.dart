@@ -26,6 +26,19 @@ class _MyPageState extends ConsumerState<MyPage> {
     super.dispose();
   }
 
+  String _convertRoleToKorean(String? role) {
+    switch (role) {
+      case 'ADMIN':
+        return '디렉터';
+      case 'LEADER':
+        return '나무장';
+      case 'USER':
+        return '나무원';
+      default:
+        return role ?? '';
+    }
+  }
+
   void _changePassword() async {
     final current = _currentPasswordController.text.trim();
     final newPass = _newPasswordController.text.trim();
@@ -91,6 +104,7 @@ class _MyPageState extends ConsumerState<MyPage> {
     final authState = ref.watch(authProvider);
     final token = authState['token'];
     final role = authState['role'];
+    final tree = authState['tree'];
 
     String loginId = "";
     if (token != null && token.isNotEmpty) {
@@ -101,6 +115,8 @@ class _MyPageState extends ConsumerState<MyPage> {
         loginId = "토큰 오류";
       }
     }
+
+    final koreanRole = _convertRoleToKorean(role);
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -147,19 +163,41 @@ class _MyPageState extends ConsumerState<MyPage> {
                     ),
                   ),
                   SizedBox(height: 8),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.color5,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                      role ?? '',
-                      style: AppTypography.body3.copyWith(
-                        color: AppColors.color3,
-                        fontWeight: FontWeight.w500,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.color5,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          koreanRole,
+                          style: AppTypography.body3.copyWith(
+                            color: AppColors.color3,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                       ),
-                    ),
+                      if (tree != null && tree.isNotEmpty) ...[
+                        SizedBox(width: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.color4,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            tree,
+                            style: AppTypography.body3.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ]
+                    ],
                   ),
                 ],
               ),

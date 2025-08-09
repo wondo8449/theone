@@ -63,43 +63,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // 로고 영역
-              Container(
-                padding: EdgeInsets.all(32),
-                margin: EdgeInsets.only(bottom: 48),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.color6.withOpacity(0.3),
-                      offset: Offset(0, 4),
-                      blurRadius: 12,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Text(
-                      'THE ONE',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.color2,
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      '로그인하여 시작하세요',
-                      style: AppTypography.body2.copyWith(
-                        color: AppColors.color3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
               // 입력 필드 영역
               Container(
                 padding: EdgeInsets.all(24),

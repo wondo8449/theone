@@ -23,10 +23,11 @@ class AuthApi {
       final data = decodedResponse['data'];
 
       final isAccepted = data['termsAccepted'];
+      final tree = data['tree'] ?? ''; // tree 정보 추가
 
       if (authHeader != null && authHeader.startsWith('Bearer ')) {
         final token = authHeader.substring(7);
-        ref.read(authProvider.notifier).login(token, isAccepted);
+        ref.read(authProvider.notifier).login(token, isAccepted, tree);
       } else {
         throw Exception('토큰이 응답 헤더에 없습니다.');
       }
